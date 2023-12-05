@@ -43,7 +43,7 @@ ax.tick_params(labelsize=20)
 ax.plot(xp, p, linewidth=2, color='#006E4A', marker='.', label=f'{o}', alpha=.5)
 ax.plot(xp, trendp, linewidth=2, color='black', label=f'{o} trend')
 ax.scatter(np.array([]), np.array([]), color='#A62000', label='Small variance', s=100)
-ax.scatter(np.array([]), np.array([]), color='#FFAA00', label='Small derivative', s=100)
+ax.scatter(np.array([]), np.array([]), color='#FFAA00', label='Small variance and derivative', s=100)
 for i in range(2, len(p), 2):
     if np.var(np.array([p[i], p[i-1], p[i-2]])) < 5e-6:
         ax.plot(np.array([xp[i], xp[i-1], xp[i-2]]), np.array([p[i], p[i-1], p[i-2]]),

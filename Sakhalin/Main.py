@@ -14,6 +14,7 @@ from scipy.signal import savgol_filter
 from tkinter import *
 from tqdm import tqdm_gui
 from tkinter.ttk import Checkbutton, Combobox
+from tkinter.messagebox import showinfo
 
 DateStart = datetime.datetime.strptime((open('DataTXT/INFO.dat').readlines()[5].strip()),
                                        '%Y.%m.%d %H:%M:%S.%f').date()
@@ -784,6 +785,10 @@ def processing(DateStart=DateStart):
     df_na = np.arange(0)
     df_l = np.arange(0)
     arrHs = np.arange(0)
+    arrkh = np.arange(0)
+    arreps = np.arange(0)
+    arra = np.arange(0)
+    arrUr = np.arange(0)
 
     if isprocessed == 'Not processed':
         with open('Data/isprocessed.txt', 'w') as file:
@@ -815,6 +820,10 @@ def processing(DateStart=DateStart):
                     df_na = np.append(df_na, -1 * ymin / As)
                     df_l = np.append(df_l, wavelenght / Hs)
                     arrHs = np.append(arrHs, Hs)
+                    arrkh = np.append(arrkh, kh)
+                    arreps = np.append(arreps, eps)
+                    arra = np.append(arra, a)
+                    arrUr = np.append(arrUr, Ur)
                 except FileNotFoundError:
                     Error = True
                 if Error:
@@ -826,6 +835,10 @@ def processing(DateStart=DateStart):
         np.save('Data/DF_L', df_l)
         np.save('Data/MeanHs', np.mean(arrHs))
         np.save('Data/MeanAs', np.mean(arrHs) / 2)
+        np.save('Data/All_kh', arrkh)
+        np.save('Data/All_e', arreps)
+        np.save('Data/All_a', arra)
+        np.save('Data/All_Ur', arrUr)
 
 
 def amplitudes_distribution(o):
@@ -1063,7 +1076,7 @@ def distribution_for_set(o, DateStart=DateStart):
     ax.plot(x3, y3, linewidth=2, marker='.', alpha=.65,
             color='#BF3030', label=f'{o} ∈ [{np.round(p2, 2)};{np.round(p3, 2)})')
     ax.plot(x4, y4, linewidth=2, marker='.', alpha=.65,
-            color='red', label=f'{o} ∈ [{np.round(p3, 2)};{np.round(p4, 2)}]')
+            color='#FF6A00', label=f'{o} ∈ [{np.round(p3, 2)};{np.round(p4, 2)}]')
     ax.plot(xrg, yr, linewidth=2, color='black', linestyle='--', label='Rayleigh distribution')
     ax.plot(xrg, yg, linewidth=2, color='black', label='Glukhovskiy distribution')
     ax.set_xlabel('H/Hs', fontsize=20)
@@ -1109,7 +1122,7 @@ def quasiperiodicity_check(o, DateStart=DateStart):
     ax.plot(xp, p, linewidth=2, color='#006E4A', marker='.', label=f'{o}', alpha=.5)
     ax.plot(xp, trendp, linewidth=2, color='black', label=f'{o} trend')
     ax.scatter(np.array([]), np.array([]), color='#A62000', label='Small variance', s=100)
-    ax.scatter(np.array([]), np.array([]), color='#FFAA00', label='Small derivative', s=100)
+    ax.scatter(np.array([]), np.array([]), color='#FFAA00', label='Small variance and derivative', s=100)
     for i in range(2, len(p), 2):
         if np.var(np.array([p[i], p[i - 1], p[i - 2]])) < 5e-6:
             ax.plot(np.array([xp[i], xp[i - 1], xp[i - 2]]), np.array([p[i], p[i - 1], p[i - 2]]),
@@ -1175,97 +1188,41 @@ window = Tk()
 window.title("Data processing and analysis")
 window.geometry('1920x1080')
 
-lbl0 = Label(window, text="  Data processing.  ", font=("Arial Bold", 16))
-lbl0.grid(column=0, row=0)
-lblreduce = Label(window, text="  Reduse point numbers for plotting by 2^", font=("Arial Bold", 16))
-lblreduce.grid(column=1, row=0)
+lbl0 = Label(window, text="  Data processing.  ", font=("Arial Bold", 16)).grid(column=0, row=0)
+lblreduce = Label(window, text="  Reduse point numbers for plotting by 2^", font=("Arial Bold", 16)).grid(column=1, row=0)
 txtr = Entry(window, width=3, font=("Arial Bold", 10))
 txtr.insert(-1, '10')
 txtr.grid(column=2, row=0)
-
-
-lbl1 = Label(window, text="  Step 1: Convert .dat to .npy:  ", font=("Arial Bold", 16))
-lbl1.grid(column=0, row=1)
-btn1 = Button(window, text="Convert", font=("Arial Bold", 14), command=data_from_txt)
-btn1.grid(column=1, row=1)
-
-lbl2 = Label(window, text="  Step 2: Pressure plotting:  ", font=("Arial Bold", 16))
-lbl2.grid(column=0, row=2)
-btn2 = Button(window, text="Plot", font=("Arial Bold", 14), command=lambda: pressure_plotting(float(txtr.get())))
-btn2.grid(column=1, row=2)
-
-lbl3 = Label(window, text="  Step 3: Manual remove:  ", font=("Arial Bold", 16))
-lbl3.grid(column=0, row=3)
-btn3 = Button(window, text="Show", font=("Arial Bold", 14))
-btn3.grid(column=1, row=3)
-
-lbl4 = Label(window, text="  Step 4: Converting and plotting:  ", font=("Arial Bold", 16))
-lbl4.grid(column=0, row=4)
-btn4 = Button(window, text="Convert and plot", font=("Arial Bold", 14), command=lambda: conversion(float(txtr.get())))
-btn4.grid(column=1, row=4)
-
-lbl5 = Label(window, text="  Step 5: Removing low frequencies:  ", font=("Arial Bold", 16))
-lbl5.grid(column=0, row=5)
-btn5 = Button(window, text="Transform", font=("Arial Bold", 14),
-              command=lambda: fourier_transforms(int(txttmax.get()), int(txtr.get())))
-btn5.grid(column=1, row=5)
-lbltmax = Label(window, text="max period (minutes): ", font=("Arial Bold", 16))
-lbltmax.grid(column=2, row=5)
+lbl1 = Label(window, text="  Step 1: Convert .dat to .npy:  ", font=("Arial Bold", 16)).grid(column=0, row=1)
+lbl2 = Label(window, text="  Step 2: Pressure plotting:  ", font=("Arial Bold", 16)).grid(column=0, row=2)
+lbl3 = Label(window, text="  Step 3: Manual remove:  ", font=("Arial Bold", 16)).grid(column=0, row=3)
+lbl4 = Label(window, text="  Step 4: Converting and plotting:  ", font=("Arial Bold", 16)).grid(column=0, row=4)
+lbl5 = Label(window, text="  Step 5: Removing low frequencies:  ", font=("Arial Bold", 16)).grid(column=0, row=5)
+lbltmax = Label(window, text="max period (minutes): ", font=("Arial Bold", 16)).grid(column=2, row=5)
 txttmax = Entry(window, width=3, font=("Arial Bold", 10))
 txttmax.insert(-1, '10')
 txttmax.grid(column=3, row=5)
-
-
-def command():
-    if chk_stateinterp.get():
-        interpolation = 'Y'
-    else:
-        interpolation = 'N'
-    if chk_statelowr.get():
-        spikes = 'Y'
-    else:
-        spikes = 'N'
-    lowrms_spikes_emptyfiles_spline(float(txtlowrv.get()), float(txtinterpr.get()), spikes, interpolation)
-
-
-lbl6 = Label(window, text="  Step 6: Modify folder and data:  ", font=("Arial Bold", 16))
-lbl6.grid(column=0, row=6)
-btn6 = Button(window, text="Modify", font=("Arial Bold", 14),
-              command=command)
-btn6.grid(column=1, row=6)
-lblinterp = Label(window, text="interpolate: ", font=("Arial Bold", 16))
-lblinterp.grid(column=2, row=6)
+lbl6 = Label(window, text="  Step 6: Modify folder and data:  ", font=("Arial Bold", 16)).grid(column=0, row=6)
+lblinterp = Label(window, text="interpolate: ", font=("Arial Bold", 16)).grid(column=2, row=6)
 chk_stateinterp = BooleanVar()
 chk_stateinterp.set(False)
 chkinterp = Checkbutton(window, var=chk_stateinterp)
 chkinterp.grid(column=3, row=6)
-lbllowr = Label(window, text="remove spikes: ", font=("Arial Bold", 16))
+lbllowr = Label(window, text="remove spikes: ", font=("Arial Bold", 16)).grid(column=4, row=6)
 chk_statelowr = BooleanVar()
 chk_statelowr.set(False)
 chklowr = Checkbutton(window, var=chk_statelowr)
-lbllowr.grid(column=4, row=6)
 chklowr.grid(column=5, row=6)
-lblinterpr = Label(window, text=" interpolation rate: ", font=("Arial Bold", 16))
-lblinterpr.grid(column=6, row=6)
+lblinterpr = Label(window, text=" interpolation rate: ", font=("Arial Bold", 16)).grid(column=6, row=6)
 txtinterpr = Entry(window, width=3, font=("Arial Bold", 10))
 txtinterpr.insert(-1, '8')
 txtinterpr.grid(column=7, row=6)
-lbllowrv = Label(window, text=" min. RMS: ", font=("Arial Bold", 16))
-lbllowrv.grid(column=8, row=6)
+lbllowrv = Label(window, text=" min. RMS: ", font=("Arial Bold", 16)).grid(column=8, row=6)
 txtlowrv = Entry(window, width=11, font=("Arial Bold", 10))
 txtlowrv.insert(-1, '0.019')
 txtlowrv.grid(column=9, row=6)
-
-lbl7 = Label(window, text="  Step 7: Spectum plotting:  ", font=("Arial Bold", 16))
-lbl7.grid(column=0, row=7)
-btn7 = Button(window, text="Plot", font=("Arial Bold", 14), command=spectrum_plotting)
-btn7.grid(column=1, row=7)
-
-lbl8 = Label(window, text="  Step 8: Window Fourier transform:  ", font=("Arial Bold", 16))
-lbl8.grid(column=0, row=8)
-btn8 = Button(window, text="Plot", font=("Arial Bold", 14),
-              command=lambda: window_ft(float(txtws.get()), float(txtdw.get()), float(txtpart.get()), combo8.get()))
-btn8.grid(column=1, row=8)
+lbl7 = Label(window, text="  Step 7: Spectum plotting:  ", font=("Arial Bold", 16)).grid(column=0, row=7)
+lbl8 = Label(window, text="  Step 8: Window Fourier transform:  ", font=("Arial Bold", 16)).grid(column=0, row=8)
 lblws = Label(window, text=" window size (min.): ", font=("Arial Bold", 16))
 lblws.grid(column=2, row=8)
 txtws = Entry(window, width=3, font=("Arial Bold", 10))
@@ -1287,47 +1244,25 @@ lblpart.grid(column=8, row=8)
 txtpart = Entry(window, width=3, font=("Arial Bold", 10))
 txtpart.insert(-1, '10')
 txtpart.grid(column=9, row=8)
-
-lbl9 = Label(window, text="  Step 9: Spectum characteristics:  ", font=("Arial Bold", 16))
-lbl9.grid(column=0, row=9)
-btn9 = Button(window, text="Plot", font=("Arial Bold", 14), command=specrtum_characteristics)
-btn9.grid(column=1, row=9)
-
-lbl10 = Label(window, text="  Step 10: Individual waves processing:  ", font=("Arial Bold", 16))
-lbl10.grid(column=0, row=10)
-btn10 = Button(window, text="Start", font=("Arial Bold", 14), command=processing)
-btn10.grid(column=1, row=10)
-
+lbl9 = Label(window, text="  Step 9: Spectum characteristics:  ", font=("Arial Bold", 16)).grid(column=0, row=9)
+lbl10 = Label(window, text="  Step 10: Individual waves processing:  ", font=("Arial Bold", 16)).grid(column=0, row=10)
 lbld = Label(window, text="  Data analysis.  ", font=("Arial Bold", 16))
 lbld.grid(column=0, row=11)
-
-lbl11 = Label(window, text="  Step 11: Amplitudes distribution:  ", font=("Arial Bold", 16))
-lbl11.grid(column=0, row=12)
-btn11 = Button(window, text="Plot", font=("Arial Bold", 14), command=lambda: amplitudes_distribution(combo11.get()))
-btn11.grid(column=1, row=12)
-lblscale = Label(window, text=" scale: ", font=("Arial Bold", 16))
-lblscale.grid(column=6, row=12)
+lbl11 = Label(window, text="  Step 11: Amplitudes distribution:  ", font=("Arial Bold", 16)).grid(column=0, row=12)
+lblscale = Label(window, text=" scale: ", font=("Arial Bold", 16)).grid(column=6, row=12)
 combo11 = Combobox(window, font=("Arial Bold", 16), width=5)
 combo11['values'] = ('Lin', 'Log')
 combo11.current(1)
 combo11.grid(column=7, row=12)
-
 lbl12 = Label(window, text="  Step 12: Height distribution:  ", font=("Arial Bold", 16))
 lbl12.grid(column=0, row=13)
-btn12 = Button(window, text="Plot", font=("Arial Bold", 14), command=lambda: height_distribution(combo12.get()))
-btn12.grid(column=1, row=13)
 lblscale = Label(window, text=" scale: ", font=("Arial Bold", 16))
 lblscale.grid(column=6, row=13)
 combo12 = Combobox(window, font=("Arial Bold", 16), width=5)
 combo12['values'] = ('Lin', 'Log')
 combo12.current(1)
 combo12.grid(column=7, row=13)
-
-lbl13 = Label(window, text="  Step 13: Heatmap MxN:  ", font=("Arial Bold", 16))
-lbl13.grid(column=0, row=14)
-btn13 = Button(window, text="Plot", font=("Arial Bold", 14),
-               command=lambda: heatmap(combo13.get, int(txtm.get()), int(txtn.get())))
-btn13.grid(column=1, row=14)
+lbl13 = Label(window, text="  Step 13: Heatmap MxN:  ", font=("Arial Bold", 16)).grid(column=0, row=14)
 lblm = Label(window, text=" M: ", font=("Arial Bold", 16))
 lblm.grid(column=2, row=14)
 txtm = Entry(window, width=3, font=("Arial Bold", 10))
@@ -1344,27 +1279,62 @@ combo13 = Combobox(window, font=("Arial Bold", 16), width=5)
 combo13['values'] = ('kh', 'Tz', 'a', 'e', 'Ur', 'width', 'w0', 'E')
 combo13.current(0)
 combo13.grid(column=7, row=14)
-
-lbl14 = Label(window, text="  Step 15: Distribution for set:  ", font=("Arial Bold", 16))
-lbl14.grid(column=0, row=15)
-btn14 = Button(window, text="Plot", font=("Arial Bold", 14), command=lambda: distribution_for_set(combo14.get))
-btn14.grid(column=1, row=15)
+lbl14 = Label(window, text="  Step 15: Distribution for set:  ", font=("Arial Bold", 16)).grid(column=0, row=15)
 lblsparam = Label(window, text=" parameter: ", font=("Arial Bold", 16))
 lblsparam.grid(column=6, row=15)
 combo14 = Combobox(window, font=("Arial Bold", 16), width=5)
-combo14['values'] = ('kh', 'Tz', 'a', 'e', 'Ur', 'width', 'w0', 'E')
+combo14['values'] = ('kh', 'a', 'e', 'Ur', 'width', 'w0', 'E')
 combo14.current(0)
 combo14.grid(column=7, row=15)
-
-lbl15 = Label(window, text="  Step 15: Quasiperiosicity:  ", font=("Arial Bold", 16))
-lbl15.grid(column=0, row=16)
-btn15 = Button(window, text="Plot", font=("Arial Bold", 14), command=lambda: quasiperiodicity_check(combo15.get))
-btn15.grid(column=1, row=16)
-lblqparam = Label(window, text=" parameter: ", font=("Arial Bold", 16))
-lblqparam.grid(column=6, row=16)
+lbl15 = Label(window, text="  Step 16: Quasiperiosicity:  ", font=("Arial Bold", 16)).grid(column=0, row=16)
+lblqparam = Label(window, text=" parameter: ", font=("Arial Bold", 16)).grid(column=6, row=16)
 combo15 = Combobox(window, font=("Arial Bold", 16), width=5)
 combo15['values'] = ('Hs', 'Tz')
 combo15.current(0)
 combo15.grid(column=7, row=16)
+
+
+def command0():
+    fourier_transforms(int(txtr.get()), float(txttmax.get()))
+    showinfo(title="Info", message="Transformed, lounch one more time")
+
+
+def command1():
+    if chk_stateinterp.get():
+        interpolation = 'Y'
+    else:
+        interpolation = 'N'
+    if chk_statelowr.get():
+        spikes = 'Y'
+    else:
+        spikes = 'N'
+    lowrms_spikes_emptyfiles_spline(float(txtlowrv.get()), float(txtinterpr.get()), spikes, interpolation)
+
+
+btn1 = Button(window, text="Convert", font=("Arial Bold", 14), command=data_from_txt).grid(column=1, row=1)
+btn2 = Button(window, text="Plot", font=("Arial Bold", 14),
+              command=lambda: pressure_plotting(int(txtr.get()))).grid(column=1, row=2)
+btn3 = Button(window, text="Show", font=("Arial Bold", 14), command=manual_remove).grid(column=1, row=3)
+btn4 = Button(window, text="Convert and plot", font=("Arial Bold", 14),
+              command=lambda: conversion(int(txtr.get()))).grid(column=1, row=4)
+btn5 = Button(window, text="Run", font=("Arial Bold", 14), command=command0).grid(column=1, row=5)
+btn6 = Button(window, text="Modify", font=("Arial Bold", 14),
+              command=command1).grid(column=1, row=6)
+btn7 = Button(window, text="Plot", font=("Arial Bold", 14), command=spectrum_plotting).grid(column=1, row=7)
+btn8 = Button(window, text="Plot", font=("Arial Bold", 14),
+              command=lambda: window_ft(int(txtws.get()), int(txtdw.get()),
+                                        float(txtpart.get()), combo8.get())).grid(column=1, row=8)
+btn9 = Button(window, text="Plot", font=("Arial Bold", 14), command=specrtum_characteristics).grid(column=1, row=9)
+btn10 = Button(window, text="Start", font=("Arial Bold", 14), command=processing).grid(column=1, row=10)
+btn11 = Button(window, text="Plot", font=("Arial Bold", 14),
+               command=lambda: amplitudes_distribution(combo11.get())).grid(column=1, row=12)
+btn12 = Button(window, text="Plot", font=("Arial Bold", 14),
+               command=lambda: height_distribution(combo12.get())).grid(column=1, row=13)
+btn13 = Button(window, text="Plot", font=("Arial Bold", 14),
+               command=lambda: heatmap(combo13.get(), int(txtm.get()), int(txtn.get()))).grid(column=1, row=14)
+btn14 = Button(window, text="Plot", font=("Arial Bold", 14),
+               command=lambda: distribution_for_set(combo14.get())).grid(column=1, row=15)
+btn15 = Button(window, text="Plot", font=("Arial Bold", 14),
+               command=lambda: quasiperiodicity_check(combo15.get())).grid(column=1, row=16)
 
 window.mainloop()

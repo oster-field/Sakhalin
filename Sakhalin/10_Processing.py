@@ -13,6 +13,10 @@ df_pa = np.arange(0)
 df_na = np.arange(0)
 df_l = np.arange(0)
 arrHs = np.arange(0)
+arrkh = np.arange(0)
+arreps = np.arange(0)
+arra = np.arange(0)
+arrUr = np.arange(0)
 
 if isprocessed == 'Not processed':
     with open('Data/isprocessed.txt', 'w') as file:
@@ -44,6 +48,10 @@ if isprocessed == 'Not processed':
                 df_na = np.append(df_na, -1 * ymin / As)
                 df_l = np.append(df_l, wavelenght / Hs)
                 arrHs = np.append(arrHs, Hs)
+                arrkh = np.append(arrkh, kh)
+                arreps = np.append(arreps, eps)
+                arra = np.append(arra, a)
+                arrUr = np.append(arrUr, Ur)
             except FileNotFoundError:
                 Error = True
             if Error:
@@ -55,3 +63,7 @@ if isprocessed == 'Not processed':
     np.save('Data/DF_L', df_l)
     np.save('Data/MeanHs', np.mean(arrHs))
     np.save('Data/MeanAs', np.mean(arrHs) / 2)
+    np.save('Data/All_kh', arrkh)
+    np.save('Data/All_e', arreps)
+    np.save('Data/All_a', arra)
+    np.save('Data/All_Ur', arrUr)

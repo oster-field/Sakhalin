@@ -68,7 +68,7 @@ ax.plot(x2, y2, linewidth=2, marker='.', alpha=.65,
 ax.plot(x3, y3, linewidth=2, marker='.', alpha=.65,
         color='#BF3030', label=f'{o} ∈ [{np.round(p2, 2)};{np.round(p3, 2)})')
 ax.plot(x4, y4, linewidth=2, marker='.', alpha=.65,
-        color='red', label=f'{o} ∈ [{np.round(p3, 2)};{np.round(p4, 2)}]')
+        color='#FF6A00', label=f'{o} ∈ [{np.round(p3, 2)};{np.round(p4, 2)}]')
 ax.plot(xrg, yr, linewidth=2, color='black', linestyle='--', label='Rayleigh distribution')
 ax.plot(xrg, yg, linewidth=2, color='black', label='Glukhovskiy distribution')
 ax.set_xlabel('H/Hs', fontsize=20)
