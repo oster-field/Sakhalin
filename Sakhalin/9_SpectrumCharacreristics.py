@@ -30,7 +30,7 @@ for i in tqdm(range(0, n), desc="Progress: ", colour='green'):
 
 np.save('Data/All_width', width)
 np.save('Data/All_w0', w0)
-np.save('Data/All_E', E)
+np.save('Data/All_energy', E)
 
 dates, ds, de = newdates(DateStart, DateEnd)
 Deltadate = datetime.timedelta(days=1)
@@ -45,7 +45,7 @@ while ds <= de:
             arr = np.load('Data/' + filename + ' reading ' + str(i) + '.npy')
             np.save('Data/' + filename + ' reading ' + str(i) + ' width', width[c])
             np.save('Data/' + filename + ' reading ' + str(i) + ' w0', w0[c])
-            np.save('Data/' + filename + ' reading ' + str(i) + ' E', E[c])
+            np.save('Data/' + filename + ' reading ' + str(i) + ' energy', E[c])
             c += 1
         except FileNotFoundError:
             Error = True

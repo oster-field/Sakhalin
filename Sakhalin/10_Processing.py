@@ -64,6 +64,6 @@ if isprocessed == 'Not processed':
     np.save('Data/MeanHs', np.mean(arrHs))
     np.save('Data/MeanAs', np.mean(arrHs) / 2)
     np.save('Data/All_kh', arrkh)
-    np.save('Data/All_e', arreps)
+    np.save('Data/All_eps', arreps)
     np.save('Data/All_a', arra)
     np.save('Data/All_Ur', arrUr)

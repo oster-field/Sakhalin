@@ -6,7 +6,7 @@ import sys
 import datetime
 from tqdm import tqdm
 
-print('kh/Tz/a/e/Ur/width/w0/E?')
+print('kh/Tz/a/eps/Ur/width/w0/energy?')
 o = input()
 dates, ds, de = newdates(DateStart, DateEnd)
 pbar = tqdm(total=len(dates), desc="Processing: ", colour='green')

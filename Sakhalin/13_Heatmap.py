@@ -7,7 +7,7 @@ import datetime
 import sys
 from tqdm import tqdm
 
-print('kh/Tz/a/e/Ur/width/w0/E?')
+print('kh/Tz/a/eps/Ur/width/w0/energy?')
 o = input()
 m = 24  # Число строк
 n = 21  # Число столбцов
