@@ -88,28 +88,21 @@ y_low, y_high = ax.get_ylim()
 ax.set_aspect(abs((x_right - x_left) / (y_low - y_high)) * ratio)
 ax.tick_params(labelsize=17)
 if o == 'kh':
-    ax.set_ylabel('4σ, [m]', fontsize=20)
     ax.set_xlabel('kh', fontsize=20)
 elif o == 'Tz':
-    ax.set_ylabel('Hs, [m]', fontsize=20)
     ax.set_xlabel('Tz, [sec]', fontsize=20)
 elif o == 'a':
-    ax.set_ylabel('Hs, [m]', fontsize=20)
     ax.set_xlabel('a', fontsize=20)
 elif o == 'e':
-    ax.set_ylabel('Hs, [m]', fontsize=20)
     ax.set_xlabel('ε', fontsize=20)
 elif o == 'Ur':
-    ax.set_ylabel('Hs, [m]', fontsize=20)
     ax.set_xlabel('Ur', fontsize=20)
 elif o == 'WDT':
-    ax.set_ylabel('Hs, [m]', fontsize=20)
     ax.set_xlabel('Spectrum width', fontsize=20)
 elif o == 'w0':
-    ax.set_ylabel('Hs, [m]', fontsize=20)
     ax.set_xlabel('w0, [rad/sec]', fontsize=20)
 elif o == 'E':
-    ax.set_ylabel('Hs, [m]', fontsize=20)
     ax.set_xlabel('Energy', fontsize=20)
+ax.set_ylabel('Hs, [m]', fontsize=20)
 plt.subplots_adjust(left=0, bottom=0.1, right=1, top=0.98, wspace=0.2, hspace=0.2)
 plt.show()

@@ -8,7 +8,6 @@ import sys
 import datetime
 from tqdm import tqdm
 
-interpolationrate = 5  # Во сколько раз больше точек
 WindowSize = 20
 DeltaWindow = 1200
 width = np.arange(0)
@@ -17,7 +16,7 @@ w0 = np.arange(0)
 y = np.load('Data/FullRec.npy')
 window = WindowSize * 60 * Sensor_Frequency
 n = int((len(y) - window) / (DeltaWindow * Sensor_Frequency))
-w = rfftfreq(window, (1 / Sensor_Frequency) / interpolationrate)
+w = rfftfreq(window, 1 / Sensor_Frequency)
 
 for i in tqdm(range(0, n), desc="Progress: ", colour='green'):
     arr = y[i*DeltaWindow:window + i*DeltaWindow]
