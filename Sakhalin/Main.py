@@ -1,17 +1,19 @@
 import numpy as np
 import datetime
-from tqdm import tqdm
 import pandas as pd
 import os
-import matplotlib.pyplot as plt
 import sys
+import matplotlib.pyplot as plt
 from scipy.interpolate import CubicSpline
 from scipy.signal.windows import hann
 from matplotlib.patches import Rectangle
-from scipy.fftpack import fft, ifft, fftfreq, rfft, rfftfreq, irfft
+from scipy.fftpack import fft, ifft, fftfreq, rfft, rfftfreq
 from sympy import *
 from PyAstronomy import pyaC
 from scipy.signal import savgol_filter
+from tkinter import *
+from tqdm import tqdm_gui
+from tkinter.ttk import Checkbutton, Combobox
 
 DateStart = datetime.datetime.strptime((open('DataTXT/INFO.dat').readlines()[5].strip()),
                                        '%Y.%m.%d %H:%M:%S.%f').date()
@@ -57,11 +59,7 @@ def divedetector(series):
     return xbegin, ybegin, xend, yend
 
 
-def lowmean():
-    ds = datetime.datetime.strptime((open('DataTXT/INFO.dat').readlines()[5].strip()),
-                                    '%Y.%m.%d %H:%M:%S.%f').date()
-    de = datetime.datetime.strptime((open('DataTXT/INFO.dat').readlines()[7].strip()),
-                                    '%Y.%m.%d %H:%M:%S.%f').date()
+def lowmean(ds=DateStart, de=DateEnd):
     dt = datetime.timedelta(days=1)
     mean = np.arange(0)
     readings = []
@@ -244,14 +242,14 @@ def decompose(data, window_size, degree, deriv):
     return trend, seasonality, noise
 
 
-def data_from_txt():
+def data_from_txt(DateStart=DateStart):
     if not os.path.isdir("Data"):
         os.mkdir("Data")
     Pressure = np.arange(0)
     ReadingsPerFile = int(open('DataTXT/INFO.dat').readlines()[2].strip()[
                           15:17]) * 1200  # Сколько точек будет в файле .npy, 20 мин. (Для 8 Гц 9600 точек это 20 минут)
     Deltadate = datetime.timedelta(days=1)
-    pbar = tqdm(total=len(pd.date_range(DateStart, DateEnd).strftime('%d.%m').tolist()), desc="Progress: ",
+    pbar = tqdm_gui(total=len(pd.date_range(DateStart, DateEnd).strftime('%d.%m').tolist()), desc="Progress: ",
                 colour='green')
 
     while DateStart <= DateEnd:
@@ -282,7 +280,7 @@ def data_from_txt():
         file.write('Not calculated')
 
 
-def pressure_plotting(Times):
+def pressure_plotting(Times, DateStart=DateStart):
     Deltadate = datetime.timedelta(days=1)
     dates = pd.date_range(DateStart, DateEnd).strftime('%d.%m').tolist()
 
@@ -322,7 +320,7 @@ def pressure_plotting(Times):
     plt.show()
 
 
-def manual_remove():
+def manual_remove(DateStart=DateStart):
     def onclick(event):
         if event.inaxes == ax[0] or event.inaxes == ax[1]:
             xclick = round(event.xdata)
@@ -449,13 +447,13 @@ def manual_remove():
     plt.show()
 
 
-def conversion(Times):
+def conversion(Times, DateStart=DateStart):
     isconverted = open('Data/isconverted.txt').readlines()[0].strip()
     MeasurmentError = np.load('Data/MeasurmentError.npy')
     dates, ds, de = newdates(DateStart, DateEnd)
     Deltadate = datetime.timedelta(days=1)
-    pbar = tqdm(total=len(dates), desc="Depth calculating: ", colour='green')
-    pbar2 = tqdm(total=len(dates), desc="Progress: ", colour='green')
+    pbar = tqdm_gui(total=len(dates), desc="Depth calculating: ", colour='green')
+    pbar2 = tqdm_gui(total=len(dates), desc="Progress: ", colour='green')
     y = np.arange(0)
     ticks = np.arange(0)
     meanarr = np.arange(0)
@@ -525,10 +523,10 @@ def conversion(Times):
     plt.show()
 
 
-def fourier_transforms(Times, Tmax):
+def fourier_transforms(Times, TMax, DateStart=DateStart):
     dates, ds, de = newdates(DateStart, DateEnd)
     Deltadate = datetime.timedelta(days=1)
-    pbar = tqdm(total=len(dates), desc="Progress: ", colour='green')
+    pbar = tqdm_gui(total=len(dates), desc="Progress: ", colour='green')
     y = np.arange(0)
     ticks = np.arange(0)
     sizes = np.arange(0)
@@ -598,10 +596,10 @@ def fourier_transforms(Times, Tmax):
         plt.show()
 
 
-def lowrms_spikes_emptyfiles_spline(minRMSvalue, interpolationrate, spikes, interpolation):
+def lowrms_spikes_emptyfiles_spline(minRMSvalue, interpolationrate, spikes, interpolation, DateStart=DateStart):
     dates = pd.date_range(DateStart, DateEnd).strftime('%d.%m').tolist()
     Deltadate = datetime.timedelta(days=1)
-    pbar = tqdm(total=len(dates), desc="Processing: ", colour='green')
+    pbar = tqdm_gui(total=len(dates), desc="Processing: ", colour='green')
     Fl = False
 
     while DateStart <= DateEnd:
@@ -615,7 +613,6 @@ def lowrms_spikes_emptyfiles_spline(minRMSvalue, interpolationrate, spikes, inte
                 else:
                     if spikes == 'Y':
                         for j in range(len(arr) - 1):
-                            print(arr[j])
                             if np.abs(arr[j + 1] - arr[j]) > 6 * np.sqrt(np.var(arr)):
                                 arr[j + 1] = (arr[j] + arr[j + 2]) / 2
                                 Fl = True
@@ -634,7 +631,7 @@ def lowrms_spikes_emptyfiles_spline(minRMSvalue, interpolationrate, spikes, inte
         DateStart += Deltadate
 
 
-def spectrum_plotting(Times):
+def spectrum_plotting(Times=0):
     s = np.load('Data/SpectrumY.npy')
     w = np.load('Data/SpectrumX.npy')
     samples = np.load('Data/Samples.npy')
@@ -676,7 +673,7 @@ def window_ft(WindowSize, DeltaWindow, part, o):
     w = rfftfreq(window, 1 / Sensor_Frequency)
     z = []
 
-    for i in tqdm(range(0, n), desc="Progress: ", colour='green'):
+    for i in tqdm_gui(range(0, n), desc="Progress: ", colour='green'):
         arr = y[i * DeltaWindow:window + i * DeltaWindow]
         mask = hann(len(arr))
         s = np.abs(rfft(arr * mask))
@@ -709,7 +706,7 @@ def window_ft(WindowSize, DeltaWindow, part, o):
     plt.show()
 
 
-def specrtum_characteristics():
+def specrtum_characteristics(DateStart=DateStart):
     WindowSize = 20
     DeltaWindow = 1200
     width = np.arange(0)
@@ -720,7 +717,7 @@ def specrtum_characteristics():
     n = int((len(y) - window) / (DeltaWindow * Sensor_Frequency))
     w = rfftfreq(window, 1 / Sensor_Frequency)
 
-    for i in tqdm(range(0, n), desc="Progress: ", colour='green'):
+    for i in tqdm_gui(range(0, n), desc="Progress: ", colour='green'):
         arr = y[i * DeltaWindow:window + i * DeltaWindow]
         mask = hann(len(arr))
         s = np.abs(rfft(arr * mask))
@@ -737,7 +734,7 @@ def specrtum_characteristics():
     dates, ds, de = newdates(DateStart, DateEnd)
     Deltadate = datetime.timedelta(days=1)
     c = 0
-    pbar = tqdm(total=len(dates), desc="Saving: ", colour='green')
+    pbar = tqdm_gui(total=len(dates), desc="Saving: ", colour='green')
 
     while ds <= de:
         filename = ds.strftime('%Y.%m.%d')
@@ -745,9 +742,9 @@ def specrtum_characteristics():
         for i in range(1, sys.maxsize):
             try:
                 arr = np.load('Data/' + filename + ' reading ' + str(i) + '.npy')
-                np.save('Data/' + filename + ' reading ' + str(i) + ' spectrum width', width[c])
-                np.save('Data/' + filename + ' reading ' + str(i) + ' spectrum w0', w0[c])
-                np.save('Data/' + filename + ' reading ' + str(i) + ' spectrum E', E[c])
+                np.save('Data/' + filename + ' reading ' + str(i) + ' width', width[c])
+                np.save('Data/' + filename + ' reading ' + str(i) + ' w0', w0[c])
+                np.save('Data/' + filename + ' reading ' + str(i) + ' E', E[c])
                 c += 1
             except FileNotFoundError:
                 Error = True
@@ -778,10 +775,10 @@ def specrtum_characteristics():
     plt.show()
 
 
-def processing():
+def processing(DateStart=DateStart):
     dates, ds, de = newdates(DateStart, DateEnd)
     Deltadate = datetime.timedelta(days=1)
-    pbar = tqdm(total=len(dates), desc="Progress: ", colour='green')
+    pbar = tqdm_gui(total=len(dates), desc="Progress: ", colour='green')
     isprocessed = open('Data/isprocessed.txt').readlines()[0].strip()
     df_pa = np.arange(0)
     df_na = np.arange(0)
@@ -922,34 +919,19 @@ def height_distribution(o):
     plt.show()
 
 
-def heatmap(o, m, n):
+def heatmap(o, m, n, DateStart=DateStart):
     x = np.arange(0)
     Hs = np.arange(0)
     dates, ds, de = newdates(DateStart, DateEnd)
     Deltadate = datetime.timedelta(days=1)
-    pbar = tqdm(total=len(dates), desc="Progress: ", colour='green')
+    pbar = tqdm_gui(total=len(dates), desc="Progress: ", colour='green')
 
     while ds <= de:
         filename = ds.strftime('%Y.%m.%d')
         Error = False
         for i in range(1, sys.maxsize):
             try:
-                if o == 'kh':
-                    x = np.append(x, np.load('Data/' + filename + ' reading ' + str(i) + ' kh.npy'))
-                elif o == 'Tz':
-                    x = np.append(x, np.load('Data/' + filename + ' reading ' + str(i) + ' Tz.npy'))
-                elif o == 'a':
-                    x = np.append(x, np.load('Data/' + filename + ' reading ' + str(i) + ' a.npy'))
-                elif o == 'e':
-                    x = np.append(x, np.load('Data/' + filename + ' reading ' + str(i) + ' eps.npy'))
-                elif o == 'Ur':
-                    x = np.append(x, np.load('Data/' + filename + ' reading ' + str(i) + ' Ur.npy'))
-                elif o == 'WDT':
-                    x = np.append(x, np.load('Data/' + filename + ' reading ' + str(i) + ' spectrum width.npy'))
-                elif o == 'w0':
-                    x = np.append(x, np.load('Data/' + filename + ' reading ' + str(i) + ' spectrum w0.npy'))
-                elif o == 'E':
-                    x = np.append(x, np.load('Data/' + filename + ' reading ' + str(i) + ' spectrum E.npy'))
+                x = np.append(x, np.load('Data/' + filename + ' reading ' + str(i) + ' ' + str(o) + '.npy'))
                 Hs = np.append(Hs, np.load('Data/' + filename + ' reading ' + str(i) + ' Hs.npy'))
             except FileNotFoundError:
                 Error = True
@@ -1020,9 +1002,9 @@ def heatmap(o, m, n):
     plt.show()
 
 
-def distribution_for_set(o):
+def distribution_for_set(o, DateStart=DateStart):
     dates, ds, de = newdates(DateStart, DateEnd)
-    pbar = tqdm(total=len(dates), desc="Processing: ", colour='green')
+    pbar = tqdm_gui(total=len(dates), desc="Processing: ", colour='green')
     Deltadate = datetime.timedelta(days=1)
     all_p = np.sort(np.load('Data/All_' + str(o) + '.npy'))
     splitted_all_p = split_array(all_p, np.array([len(all_p) // 4, len(all_p) // 4, len(all_p) // 4,
@@ -1044,7 +1026,7 @@ def distribution_for_set(o):
             try:
                 hight = np.load('Data/' + filename + ' reading ' + str(i) + ' L.npy')
                 Hs = np.load('Data/' + filename + ' reading ' + str(i) + ' Hs.npy')
-                p = np.load('Data/' + filename + ' reading ' + str(i) + ' spectrum ' + str(o) + '.npy')
+                p = np.load('Data/' + filename + ' reading ' + str(i) + ' ' + str(o) + '.npy')
                 if p0 <= p <= p1:
                     hight1 = np.append(hight1, hight / Hs)
                 elif p1 < p <= p2:
@@ -1094,9 +1076,9 @@ def distribution_for_set(o):
     plt.show()
 
 
-def quasiperiodicity_check(o):
+def quasiperiodicity_check(o, DateStart=DateStart):
     dates, ds, de = newdates(DateStart, DateEnd)
-    pbar = tqdm(total=len(dates), desc="Processing: ", colour='green')
+    pbar = tqdm_gui(total=len(dates), desc="Processing: ", colour='green')
     Deltadate = datetime.timedelta(days=1)
     p = np.arange(0)
 
@@ -1189,4 +1171,200 @@ def spectrum_approximation():
     plt.show()
 
 
-data_from_txt()
+window = Tk()
+window.title("Data processing and analysis")
+window.geometry('1920x1080')
+
+lbl0 = Label(window, text="  Data processing.  ", font=("Arial Bold", 16))
+lbl0.grid(column=0, row=0)
+lblreduce = Label(window, text="  Reduse point numbers for plotting by 2^", font=("Arial Bold", 16))
+lblreduce.grid(column=1, row=0)
+txtr = Entry(window, width=3, font=("Arial Bold", 10))
+txtr.insert(-1, '10')
+txtr.grid(column=2, row=0)
+
+
+lbl1 = Label(window, text="  Step 1: Convert .dat to .npy:  ", font=("Arial Bold", 16))
+lbl1.grid(column=0, row=1)
+btn1 = Button(window, text="Convert", font=("Arial Bold", 14), command=data_from_txt)
+btn1.grid(column=1, row=1)
+
+lbl2 = Label(window, text="  Step 2: Pressure plotting:  ", font=("Arial Bold", 16))
+lbl2.grid(column=0, row=2)
+btn2 = Button(window, text="Plot", font=("Arial Bold", 14), command=lambda: pressure_plotting(float(txtr.get())))
+btn2.grid(column=1, row=2)
+
+lbl3 = Label(window, text="  Step 3: Manual remove:  ", font=("Arial Bold", 16))
+lbl3.grid(column=0, row=3)
+btn3 = Button(window, text="Show", font=("Arial Bold", 14))
+btn3.grid(column=1, row=3)
+
+lbl4 = Label(window, text="  Step 4: Converting and plotting:  ", font=("Arial Bold", 16))
+lbl4.grid(column=0, row=4)
+btn4 = Button(window, text="Convert and plot", font=("Arial Bold", 14), command=lambda: conversion(float(txtr.get())))
+btn4.grid(column=1, row=4)
+
+lbl5 = Label(window, text="  Step 5: Removing low frequencies:  ", font=("Arial Bold", 16))
+lbl5.grid(column=0, row=5)
+btn5 = Button(window, text="Transform", font=("Arial Bold", 14),
+              command=lambda: fourier_transforms(int(txttmax.get()), int(txtr.get())))
+btn5.grid(column=1, row=5)
+lbltmax = Label(window, text="max period (minutes): ", font=("Arial Bold", 16))
+lbltmax.grid(column=2, row=5)
+txttmax = Entry(window, width=3, font=("Arial Bold", 10))
+txttmax.insert(-1, '10')
+txttmax.grid(column=3, row=5)
+
+
+def command():
+    if chk_stateinterp.get():
+        interpolation = 'Y'
+    else:
+        interpolation = 'N'
+    if chk_statelowr.get():
+        spikes = 'Y'
+    else:
+        spikes = 'N'
+    lowrms_spikes_emptyfiles_spline(float(txtlowrv.get()), float(txtinterpr.get()), spikes, interpolation)
+
+
+lbl6 = Label(window, text="  Step 6: Modify folder and data:  ", font=("Arial Bold", 16))
+lbl6.grid(column=0, row=6)
+btn6 = Button(window, text="Modify", font=("Arial Bold", 14),
+              command=command)
+btn6.grid(column=1, row=6)
+lblinterp = Label(window, text="interpolate: ", font=("Arial Bold", 16))
+lblinterp.grid(column=2, row=6)
+chk_stateinterp = BooleanVar()
+chk_stateinterp.set(False)
+chkinterp = Checkbutton(window, var=chk_stateinterp)
+chkinterp.grid(column=3, row=6)
+lbllowr = Label(window, text="remove spikes: ", font=("Arial Bold", 16))
+chk_statelowr = BooleanVar()
+chk_statelowr.set(False)
+chklowr = Checkbutton(window, var=chk_statelowr)
+lbllowr.grid(column=4, row=6)
+chklowr.grid(column=5, row=6)
+lblinterpr = Label(window, text=" interpolation rate: ", font=("Arial Bold", 16))
+lblinterpr.grid(column=6, row=6)
+txtinterpr = Entry(window, width=3, font=("Arial Bold", 10))
+txtinterpr.insert(-1, '8')
+txtinterpr.grid(column=7, row=6)
+lbllowrv = Label(window, text=" min. RMS: ", font=("Arial Bold", 16))
+lbllowrv.grid(column=8, row=6)
+txtlowrv = Entry(window, width=11, font=("Arial Bold", 10))
+txtlowrv.insert(-1, '0.019')
+txtlowrv.grid(column=9, row=6)
+
+lbl7 = Label(window, text="  Step 7: Spectum plotting:  ", font=("Arial Bold", 16))
+lbl7.grid(column=0, row=7)
+btn7 = Button(window, text="Plot", font=("Arial Bold", 14), command=spectrum_plotting)
+btn7.grid(column=1, row=7)
+
+lbl8 = Label(window, text="  Step 8: Window Fourier transform:  ", font=("Arial Bold", 16))
+lbl8.grid(column=0, row=8)
+btn8 = Button(window, text="Plot", font=("Arial Bold", 14),
+              command=lambda: window_ft(float(txtws.get()), float(txtdw.get()), float(txtpart.get()), combo8.get()))
+btn8.grid(column=1, row=8)
+lblws = Label(window, text=" window size (min.): ", font=("Arial Bold", 16))
+lblws.grid(column=2, row=8)
+txtws = Entry(window, width=3, font=("Arial Bold", 10))
+txtws.insert(-1, '10')
+txtws.grid(column=3, row=8)
+lbldw = Label(window, text=" delta (sec.): ", font=("Arial Bold", 16))
+lbldw.grid(column=4, row=8)
+txtdw = Entry(window, width=3, font=("Arial Bold", 10))
+txtdw.insert(-1, '10')
+txtdw.grid(column=5, row=8)
+lblscale = Label(window, text=" scale: ", font=("Arial Bold", 16))
+lblscale.grid(column=6, row=8)
+combo8 = Combobox(window, font=("Arial Bold", 16), width=5)
+combo8['values'] = ('Lin', 'Log')
+combo8.current(0)
+combo8.grid(column=7, row=8)
+lblpart = Label(window, text="  part to show (%): ", font=("Arial Bold", 16))
+lblpart.grid(column=8, row=8)
+txtpart = Entry(window, width=3, font=("Arial Bold", 10))
+txtpart.insert(-1, '10')
+txtpart.grid(column=9, row=8)
+
+lbl9 = Label(window, text="  Step 9: Spectum characteristics:  ", font=("Arial Bold", 16))
+lbl9.grid(column=0, row=9)
+btn9 = Button(window, text="Plot", font=("Arial Bold", 14), command=specrtum_characteristics)
+btn9.grid(column=1, row=9)
+
+lbl10 = Label(window, text="  Step 10: Individual waves processing:  ", font=("Arial Bold", 16))
+lbl10.grid(column=0, row=10)
+btn10 = Button(window, text="Start", font=("Arial Bold", 14), command=processing)
+btn10.grid(column=1, row=10)
+
+lbld = Label(window, text="  Data analysis.  ", font=("Arial Bold", 16))
+lbld.grid(column=0, row=11)
+
+lbl11 = Label(window, text="  Step 11: Amplitudes distribution:  ", font=("Arial Bold", 16))
+lbl11.grid(column=0, row=12)
+btn11 = Button(window, text="Plot", font=("Arial Bold", 14), command=lambda: amplitudes_distribution(combo11.get()))
+btn11.grid(column=1, row=12)
+lblscale = Label(window, text=" scale: ", font=("Arial Bold", 16))
+lblscale.grid(column=6, row=12)
+combo11 = Combobox(window, font=("Arial Bold", 16), width=5)
+combo11['values'] = ('Lin', 'Log')
+combo11.current(1)
+combo11.grid(column=7, row=12)
+
+lbl12 = Label(window, text="  Step 12: Height distribution:  ", font=("Arial Bold", 16))
+lbl12.grid(column=0, row=13)
+btn12 = Button(window, text="Plot", font=("Arial Bold", 14), command=lambda: height_distribution(combo12.get()))
+btn12.grid(column=1, row=13)
+lblscale = Label(window, text=" scale: ", font=("Arial Bold", 16))
+lblscale.grid(column=6, row=13)
+combo12 = Combobox(window, font=("Arial Bold", 16), width=5)
+combo12['values'] = ('Lin', 'Log')
+combo12.current(1)
+combo12.grid(column=7, row=13)
+
+lbl13 = Label(window, text="  Step 13: Heatmap MxN:  ", font=("Arial Bold", 16))
+lbl13.grid(column=0, row=14)
+btn13 = Button(window, text="Plot", font=("Arial Bold", 14),
+               command=lambda: heatmap(combo13.get, int(txtm.get()), int(txtn.get())))
+btn13.grid(column=1, row=14)
+lblm = Label(window, text=" M: ", font=("Arial Bold", 16))
+lblm.grid(column=2, row=14)
+txtm = Entry(window, width=3, font=("Arial Bold", 10))
+txtm.insert(-1, '24')
+txtm.grid(column=3, row=14)
+lbln = Label(window, text=" N: ", font=("Arial Bold", 16))
+lbln.grid(column=4, row=14)
+txtn = Entry(window, width=3, font=("Arial Bold", 10))
+txtn.insert(-1, '21')
+txtn.grid(column=5, row=14)
+lblparam = Label(window, text=" parameter: ", font=("Arial Bold", 16))
+lblparam.grid(column=6, row=14)
+combo13 = Combobox(window, font=("Arial Bold", 16), width=5)
+combo13['values'] = ('kh', 'Tz', 'a', 'e', 'Ur', 'width', 'w0', 'E')
+combo13.current(0)
+combo13.grid(column=7, row=14)
+
+lbl14 = Label(window, text="  Step 15: Distribution for set:  ", font=("Arial Bold", 16))
+lbl14.grid(column=0, row=15)
+btn14 = Button(window, text="Plot", font=("Arial Bold", 14), command=lambda: distribution_for_set(combo14.get))
+btn14.grid(column=1, row=15)
+lblsparam = Label(window, text=" parameter: ", font=("Arial Bold", 16))
+lblsparam.grid(column=6, row=15)
+combo14 = Combobox(window, font=("Arial Bold", 16), width=5)
+combo14['values'] = ('kh', 'Tz', 'a', 'e', 'Ur', 'width', 'w0', 'E')
+combo14.current(0)
+combo14.grid(column=7, row=15)
+
+lbl15 = Label(window, text="  Step 15: Quasiperiosicity:  ", font=("Arial Bold", 16))
+lbl15.grid(column=0, row=16)
+btn15 = Button(window, text="Plot", font=("Arial Bold", 14), command=lambda: quasiperiodicity_check(combo15.get))
+btn15.grid(column=1, row=16)
+lblqparam = Label(window, text=" parameter: ", font=("Arial Bold", 16))
+lblqparam.grid(column=6, row=16)
+combo15 = Combobox(window, font=("Arial Bold", 16), width=5)
+combo15['values'] = ('Hs', 'Tz')
+combo15.current(0)
+combo15.grid(column=7, row=16)
+
+window.mainloop()

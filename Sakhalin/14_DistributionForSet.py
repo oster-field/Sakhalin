@@ -6,7 +6,7 @@ import sys
 import datetime
 from tqdm import tqdm
 
-print('width/w0/E?')
+print('kh/Tz/a/e/Ur/width/w0/E?')
 o = input()
 dates, ds, de = newdates(DateStart, DateEnd)
 pbar = tqdm(total=len(dates), desc="Processing: ", colour='green')
@@ -31,7 +31,7 @@ while ds <= de:
         try:
             hight = np.load('Data/' + filename + ' reading ' + str(i) + ' L.npy')
             Hs = np.load('Data/' + filename + ' reading ' + str(i) + ' Hs.npy')
-            p = np.load('Data/' + filename + ' reading ' + str(i) + ' spectrum ' + str(o) + '.npy')
+            p = np.load('Data/' + filename + ' reading ' + str(i) + ' ' + str(o) + '.npy')
             if p0 <= p <= p1:
                 hight1 = np.append(hight1, hight / Hs)
             elif p1 < p <= p2:

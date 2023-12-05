@@ -7,7 +7,7 @@ import datetime
 import sys
 from tqdm import tqdm
 
-print('kh/Tz/a/e/Ur/WDT/w0/E?')
+print('kh/Tz/a/e/Ur/width/w0/E?')
 o = input()
 m = 24  # Число строк
 n = 21  # Число столбцов
@@ -22,22 +22,7 @@ while ds <= de:
     Error = False
     for i in range(1, sys.maxsize):
         try:
-            if o == 'kh':
-                x = np.append(x, np.load('Data/' + filename + ' reading ' + str(i) + ' kh.npy'))
-            elif o == 'Tz':
-                x = np.append(x, np.load('Data/' + filename + ' reading ' + str(i) + ' Tz.npy'))
-            elif o == 'a':
-                x = np.append(x, np.load('Data/' + filename + ' reading ' + str(i) + ' a.npy'))
-            elif o == 'e':
-                x = np.append(x, np.load('Data/' + filename + ' reading ' + str(i) + ' eps.npy'))
-            elif o == 'Ur':
-                x = np.append(x, np.load('Data/' + filename + ' reading ' + str(i) + ' Ur.npy'))
-            elif o == 'WDT':
-                x = np.append(x, np.load('Data/' + filename + ' reading ' + str(i) + ' spectrum width.npy'))
-            elif o == 'w0':
-                x = np.append(x, np.load('Data/' + filename + ' reading ' + str(i) + ' spectrum w0.npy'))
-            elif o == 'E':
-                x = np.append(x, np.load('Data/' + filename + ' reading ' + str(i) + ' spectrum E.npy'))
+            x = np.append(x, np.load('Data/' + filename + ' reading ' + str(i) + ' ' + str(o) + '.npy'))
             Hs = np.append(Hs, np.load('Data/' + filename + ' reading ' + str(i) + ' Hs.npy'))
         except FileNotFoundError:
             Error = True

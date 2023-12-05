@@ -30,7 +30,6 @@ while DateStart <= DateEnd:
             else:
                 if spikes == 'Y':
                     for j in range(len(arr) - 1):
-                        print(arr[j])
                         if np.abs(arr[j + 1] - arr[j]) > 6 * np.sqrt(np.var(arr)):
                             arr[j + 1] = (arr[j] + arr[j + 2]) / 2
                             Fl = True

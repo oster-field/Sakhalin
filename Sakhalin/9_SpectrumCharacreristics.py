@@ -43,9 +43,9 @@ while ds <= de:
     for i in range(1, sys.maxsize):
         try:
             arr = np.load('Data/' + filename + ' reading ' + str(i) + '.npy')
-            np.save('Data/' + filename + ' reading ' + str(i) + ' spectrum width', width[c])
-            np.save('Data/' + filename + ' reading ' + str(i) + ' spectrum w0', w0[c])
-            np.save('Data/' + filename + ' reading ' + str(i) + ' spectrum E', E[c])
+            np.save('Data/' + filename + ' reading ' + str(i) + ' width', width[c])
+            np.save('Data/' + filename + ' reading ' + str(i) + ' w0', w0[c])
+            np.save('Data/' + filename + ' reading ' + str(i) + ' E', E[c])
             c += 1
         except FileNotFoundError:
             Error = True
