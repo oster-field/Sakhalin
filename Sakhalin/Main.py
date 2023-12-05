@@ -6,7 +6,6 @@ import os
 import matplotlib.pyplot as plt
 import sys
 from scipy.interpolate import CubicSpline
-from functions import Sensor_Frequency
 from scipy.signal.windows import hann
 from matplotlib.patches import Rectangle
 from scipy.fftpack import fft, ifft, fftfreq, rfft, rfftfreq, irfft
@@ -668,9 +667,7 @@ def spectrum_plotting(Times):
     plt.show()
 
 
-def window_ft(WindowSize, DeltaWindow, part):
-    print('Log/Lin?')
-    o = input()
+def window_ft(WindowSize, DeltaWindow, part, o):
     if o == 'Log':
         part *= 2
     y = np.load('Data/FullRec.npy')
@@ -1190,3 +1187,6 @@ def spectrum_approximation():
     plt.legend(fontsize=16)
     fig.canvas.mpl_connect('button_press_event', onclick_2)
     plt.show()
+
+
+data_from_txt()
