@@ -4,22 +4,23 @@
 целое количество 20-минутных фрагментов."""
 import numpy as np
 import datetime
-from functions import DateStart, DateEnd
+from functions import DateStart, DateEnd, Sensor_Frequency
 from tqdm import tqdm
 import pandas as pd
 import os
+import re
 
 if not os.path.isdir("Data"):
     os.mkdir("Data")
 Pressure = np.arange(0)
-ReadingsPerFile = int(open('DataTXT/INFO.dat').readlines()[2].strip()[
-                      15:17]) * 1200  # Сколько точек будет в файле .npy, 20 мин. (Для 8 Гц 9600 точек это 20 минут)
+ReadingsPerFile = Sensor_Frequency * 1200  # Сколько точек будет в файле .npy (Для 8 Гц 9600 точек -  20 мин.)
 Deltadate = datetime.timedelta(days=1)
 pbar = tqdm(total=len(pd.date_range(DateStart, DateEnd).strftime('%d.%m').tolist()), desc="Progress: ", colour='green')
 
 while DateStart <= DateEnd:
     counter = 0
-    filename = 'DataTXT/15_Press_meters_' + DateStart.strftime('%Y.%m.%d') + '.dat'
+    filename = 'DataTXT/' + re.findall(r'\d+', open('DataTXT/INFO.dat').readlines()[1].strip())[0] + \
+               '_Press_meters_' + DateStart.strftime('%Y.%m.%d') + '.dat'
     num_lines = len(open(filename).readlines())
     with open(filename, 'r') as file:
         for line in file:

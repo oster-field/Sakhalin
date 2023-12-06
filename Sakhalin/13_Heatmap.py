@@ -78,15 +78,15 @@ elif o == 'Tz':
     ax.set_xlabel('Tz, [sec]', fontsize=20)
 elif o == 'a':
     ax.set_xlabel('a', fontsize=20)
-elif o == 'e':
+elif o == 'eps':
     ax.set_xlabel('ε', fontsize=20)
 elif o == 'Ur':
     ax.set_xlabel('Ur', fontsize=20)
-elif o == 'WDT':
+elif o == 'width':
     ax.set_xlabel('Spectrum width', fontsize=20)
 elif o == 'w0':
     ax.set_xlabel('w0, [rad/sec]', fontsize=20)
-elif o == 'E':
+elif o == 'energy':
     ax.set_xlabel('Energy', fontsize=20)
 ax.set_ylabel('Hs, [m]', fontsize=20)
 plt.subplots_adjust(left=0, bottom=0.1, right=1, top=0.98, wspace=0.2, hspace=0.2)

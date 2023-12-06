@@ -26,12 +26,13 @@ from scipy.signal.windows import hann
 from sympy.solvers import nsolve
 from sympy import Symbol, tan
 from scipy.signal import savgol_filter
+import re
 
 DateStart = datetime.datetime.strptime((open('DataTXT/INFO.dat').readlines()[5].strip()),
                                        '%Y.%m.%d %H:%M:%S.%f').date()
 DateEnd = datetime.datetime.strptime((open('DataTXT/INFO.dat').readlines()[7].strip()),
                                      '%Y.%m.%d %H:%M:%S.%f').date()
-Sensor_Frequency = int(open('DataTXT/INFO.dat').readlines()[2].strip()[15:17])
+Sensor_Frequency = int(re.findall(r'\d+', open('DataTXT/INFO.dat').readlines()[2].strip())[0])
 
 
 def seriesreducer(arr, times, n=2):
@@ -52,7 +53,8 @@ def meanvalueplot(series):
 
 def divedetector(series):
     x, seriessplit = meanvalueplot(series)
-    a, b = np.split(seriessplit, 2)
+    a = seriessplit[0:len(seriessplit) // 2]
+    b = seriessplit[len(seriessplit) // 2:-1]
     a = np.flip(a)
     for i in a:
         if 0.5 < i < 1.5:
