@@ -41,35 +41,27 @@ def seriesreducer(arr, times, n=2):
     return arr
 
 
-def meanvalueplot(series):
-    if len(series) % 2 != 0:
-        series = np.delete(series, 0)
-    a = series[::2]
-    b = series[1::2]
-    mean = a / b
-    xmean = 2 * np.arange(0, len(mean))
-    return xmean, mean
-
-
 def divedetector(series):
-    x, seriessplit = meanvalueplot(series)
-    a = seriessplit[0:len(seriessplit) // 2]
-    b = seriessplit[len(seriessplit) // 2:-1]
-    a = np.flip(a)
-    for i in a:
-        if 0.5 < i < 1.5:
-            a = np.delete(a, [0])
-        else:
-            break
-    for i in b:
-        if 0.5 < i < 1.5:
-            b = np.delete(b, [0])
-        else:
-            break
-    xbegin = np.arange(0, len(series[0:2 * len(a)]))
-    ybegin = series[0:2 * len(a)]
-    xend = np.arange(len(series) - len(series[0:2 * len(b)]), len(series))
-    yend = np.flip(np.flip(series)[0:2 * len(b)])
+    a = series[0:len(series) // 2]
+    b = series[len(series) // 2:-1]
+    variances_a = []
+    for i in range(len(a) - 1):
+        variances_a.append(np.var(a[i:i + 2]))
+    if np.max(variances_a) > 15 * np.std(variances_a):
+        xbegin = np.arange(np.argmax(variances_a) + 50)
+        ybegin = series[xbegin]
+    else:
+        xbegin = 0
+        ybegin = 0
+    variances_b = []
+    for i in range(len(b) - 1):
+        variances_b.append(np.var(b[i:i + 2]))
+    if np.max(variances_b) > 15 * np.std(variances_b):
+        xend = np.arange(np.argmax(variances_b) - 50 + len(a), len(series))
+        yend = series[xend]
+    else:
+        xend = 0
+        yend = 0
     return xbegin, ybegin, xend, yend
 
 
@@ -258,4 +250,5 @@ def decompose(data, window_size, degree, deriv):
     seasonality = data - trend
     noise = data - seasonality
     return trend, seasonality, noise
+
 
