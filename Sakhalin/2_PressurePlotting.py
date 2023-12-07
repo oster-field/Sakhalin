@@ -9,6 +9,7 @@ import pandas as pd
 from functions import seriesreducer, divedetector, DateStart, DateEnd
 
 Times = 10  # Насколько разредить запись, количество точек уменьшается в (2**Times)
+std = 20
 Deltadate = datetime.timedelta(days=1)
 dates = pd.date_range(DateStart, DateEnd).strftime('%d.%m').tolist()
 
@@ -41,7 +42,9 @@ ax.set_xticks(ticks[::3])
 ax.set_xticklabels(dates[::3], rotation=30)
 ax.axhline(y=0, color='black', linewidth=1)
 ax.grid(axis="y")
-xbegin, ybegin, xend, yend = divedetector(y)
+xbegin, ybegin, xend, yend = divedetector(y, std)  # регулирует уровень хвостов записи
+np.save('Data/DeleteBegin', len(xbegin))
+np.save('Data/DeleteEnd', len(xend))
 ax.plot(xbegin, ybegin, linewidth=2.3, color='#BE2F33', label='Sensor immersion')
 ax.plot(xend, yend, linewidth=2.3, color='#BE2F33')
 plt.legend(fontsize=16)

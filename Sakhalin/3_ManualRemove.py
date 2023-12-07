@@ -89,33 +89,34 @@ with open('Data/log1.txt', 'w') as file:
     file.write('')
 with open('Data/log2.txt', 'w') as file:
     file.write('')
-
-for i in range(len(DaysToDelete1)):
-    print('Day ' + DaysToDelete1[i] + ' nullified')
-    with open('Data/log1.txt', 'a') as file:
-        file.write(DaysToDelete1[i] + '\n')
-    Error = False
-    for j in range(1, sys.maxsize):
-        try:
-            arr = np.load('Data/' + DaysToDelete1[i] + ' reading ' + str(j) + '.npy')
-            np.save('Data/' + DaysToDelete1[i] + ' reading ' + str(j) + '.npy', arr * 0)
-        except FileNotFoundError:
-            Error = True
-        if Error:
-            break
-for i in range(len(DaysToDelete2)):
-    print('Day ' + DaysToDelete2[i] + ' nullified')
-    with open('Data/log2.txt', 'a') as file:
-        file.write(DaysToDelete2[i] + '\n')
-    Error = False
-    for j in range(1, sys.maxsize):
-        try:
-            arr = np.load('Data/' + DaysToDelete2[i] + ' reading ' + str(j) + '.npy')
-            np.save('Data/' + DaysToDelete2[i] + ' reading ' + str(j) + '.npy', arr * 0)
-        except FileNotFoundError:
-            Error = True
-        if Error:
-            break
+if np.load('Data/DeleteBegin.npy') != 0:
+    for i in range(len(DaysToDelete1)):
+        print('Day ' + DaysToDelete1[i] + ' nullified')
+        with open('Data/log1.txt', 'a') as file:
+            file.write(DaysToDelete1[i] + '\n')
+        Error = False
+        for j in range(1, sys.maxsize):
+            try:
+                arr = np.load('Data/' + DaysToDelete1[i] + ' reading ' + str(j) + '.npy')
+                np.save('Data/' + DaysToDelete1[i] + ' reading ' + str(j) + '.npy', arr * 0)
+            except FileNotFoundError:
+                Error = True
+            if Error:
+                break
+if np.load('Data/DeleteEnd.npy') != 0:
+    for i in range(len(DaysToDelete2)):
+        print('Day ' + DaysToDelete2[i] + ' nullified')
+        with open('Data/log2.txt', 'a') as file:
+            file.write(DaysToDelete2[i] + '\n')
+        Error = False
+        for j in range(1, sys.maxsize):
+            try:
+                arr = np.load('Data/' + DaysToDelete2[i] + ' reading ' + str(j) + '.npy')
+                np.save('Data/' + DaysToDelete2[i] + ' reading ' + str(j) + '.npy', arr * 0)
+            except FileNotFoundError:
+                Error = True
+            if Error:
+                break
 
 y = np.append(np.load(filenames[0]), np.load(filenames[1]))
 p = np.append(np.load(filenames[2]), np.load(filenames[3]))

@@ -10,9 +10,9 @@ from scipy.interpolate import CubicSpline
 
 minRMSvalue = 0.019  # Минимальное значение rms, при котором запись не удаляется
 interpolationrate = 8  # Сколько точек в секунду будет после сплайн-интерполяции
-print('Delete spikes?')
+print('Delete spikes? (Y/N)')
 spikes = input()
-print('Spline interpolation?')
+print('Spline interpolation? (Y/N)')
 interpolation = input()
 dates = pd.date_range(DateStart, DateEnd).strftime('%d.%m').tolist()
 Deltadate = datetime.timedelta(days=1)
@@ -27,6 +27,7 @@ while DateStart <= DateEnd:
             arr = np.load('Data/' + filename + ' reading ' + str(i) + '.npy')
             if len(arr) == 0 or np.mean(arr) == 0 or rmsValue(arr) < minRMSvalue:
                 os.remove('Data/' + filename + ' reading ' + str(i) + '.npy')
+                print('Data/' + filename + ' reading ' + str(i) + '.npy removed')
             else:
                 if spikes == 'Y':
                     for j in range(len(arr) - 1):
@@ -35,6 +36,7 @@ while DateStart <= DateEnd:
                             Fl = True
                     if Fl:
                         np.save('Data/' + filename + ' reading ' + str(i), arr)
+                        print('Spike removed')
                         Fl = False
                 if interpolation == 'Y':
                     cs = CubicSpline(np.arange(len(arr)), arr)

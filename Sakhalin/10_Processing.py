@@ -19,8 +19,6 @@ arra = np.arange(0)
 arrUr = np.arange(0)
 
 if isprocessed == 'Not processed':
-    with open('Data/isprocessed.txt', 'w') as file:
-        file.write('Processed')
     while ds <= de:
         filename = ds.strftime('%Y.%m.%d')
         Error = False
@@ -67,3 +65,5 @@ if isprocessed == 'Not processed':
     np.save('Data/All_eps', arreps)
     np.save('Data/All_a', arra)
     np.save('Data/All_Ur', arrUr)
+    with open('Data/isprocessed.txt', 'w') as file:
+        file.write('Processed')

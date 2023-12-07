@@ -55,12 +55,7 @@ if istransformed == 'Not transformed':
     y = y[sizes[0]:-sizes[-1]]
     np.save('Data/FullRec', y)
     for i in range(len(filenames)):
-        if i == 1 or i == len(filenames) - 1:
-            np.save(filenames[i], edge_effect(splittedy[i]))
-        elif i == 0 or i == len(filenames):
-            np.save(filenames[i], np.arange(0))
-        else:
-            np.save(filenames[i], splittedy[i])
+        np.save(filenames[i], splittedy[i])
     with open('Data/istransformed.txt', 'w') as file:
         file.write('Transformed')
     print('Transformed, lounch one more time')

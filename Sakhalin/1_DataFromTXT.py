@@ -16,11 +16,14 @@ Pressure = np.arange(0)
 ReadingsPerFile = Sensor_Frequency * 1200  # Сколько точек будет в файле .npy (Для 8 Гц 9600 точек -  20 мин.)
 Deltadate = datetime.timedelta(days=1)
 pbar = tqdm(total=len(pd.date_range(DateStart, DateEnd).strftime('%d.%m').tolist()), desc="Progress: ", colour='green')
-
+Sensor_Number = re.findall(r'\d+', open('DataTXT/INFO.dat').readlines()[1].strip())[0]
+if int(Sensor_Number) == 0:
+    delta = 9
+else:
+    delta = 0
 while DateStart <= DateEnd:
     counter = 0
-    filename = 'DataTXT/' + re.findall(r'\d+', open('DataTXT/INFO.dat').readlines()[1].strip())[0] + \
-               '_Press_meters_' + DateStart.strftime('%Y.%m.%d') + '.dat'
+    filename = 'DataTXT/' + Sensor_Number + '_Press_meters_' + DateStart.strftime('%Y.%m.%d') + '.dat'
     num_lines = len(open(filename).readlines())
     with open(filename, 'r') as file:
         for line in file:
@@ -28,7 +31,7 @@ while DateStart <= DateEnd:
             if (len(Pressure) == ReadingsPerFile) or (len(Pressure) == num_lines % ReadingsPerFile) and (
                     counter * ReadingsPerFile + num_lines % ReadingsPerFile == num_lines):
                 np.save('Data/' + DateStart.strftime('%Y.%m.%d') + ' reading ' + str(counter + 1),
-                        Pressure.astype(float))
+                        Pressure.astype(float) + delta)
                 Pressure = np.arange(0)
                 counter += 1
     pbar.update(1)

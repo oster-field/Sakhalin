@@ -41,27 +41,27 @@ def seriesreducer(arr, times, n=2):
     return arr
 
 
-def divedetector(series):
+def divedetector(series, p):
     a = series[0:len(series) // 2]
     b = series[len(series) // 2:-1]
     variances_a = []
     for i in range(len(a) - 1):
         variances_a.append(np.var(a[i:i + 2]))
-    if np.max(variances_a) > 15 * np.std(variances_a):
+    if np.max(variances_a) > p * np.std(variances_a):
         xbegin = np.arange(np.argmax(variances_a) + 50)
         ybegin = series[xbegin]
     else:
-        xbegin = 0
-        ybegin = 0
+        xbegin = np.arange(0)
+        ybegin = np.arange(0)
     variances_b = []
     for i in range(len(b) - 1):
         variances_b.append(np.var(b[i:i + 2]))
-    if np.max(variances_b) > 15 * np.std(variances_b):
+    if np.max(variances_b) > p * np.std(variances_b):
         xend = np.arange(np.argmax(variances_b) - 50 + len(a), len(series))
         yend = series[xend]
     else:
-        xend = 0
-        yend = 0
+        xend = np.arange(0)
+        yend = np.arange(0)
     return xbegin, ybegin, xend, yend
 
 

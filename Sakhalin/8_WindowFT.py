@@ -7,7 +7,7 @@ from functions import Sensor_Frequency
 from scipy.signal.windows import hann
 
 WindowSize = 10  # Окно преобразования, в минутах
-DeltaWindow = 10  # Сдвиг окна, в секундах
+DeltaWindow = 60  # Сдвиг окна, в секундах
 part = 10  # Процент от спектра, достаточный для отображения
 print('Log/Lin?')
 o = input()

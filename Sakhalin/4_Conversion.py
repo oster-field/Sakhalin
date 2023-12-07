@@ -10,7 +10,10 @@ from tqdm import tqdm
 
 Times = 10  # Насколько разредить запись, количество точек уменьшается в (2**Times)
 isconverted = open('Data/isconverted.txt').readlines()[0].strip()
-MeasurmentError = np.load('Data/MeasurmentError.npy')
+if np.load('Data/DeleteBegin.npy') != 0:
+    MeasurmentError = np.load('Data/MeasurmentError.npy')
+else:
+    MeasurmentError = 0
 dates, ds, de = newdates(DateStart, DateEnd)
 Deltadate = datetime.timedelta(days=1)
 pbar = tqdm(total=len(dates), desc="Depth calculating: ", colour='green')
@@ -29,7 +32,7 @@ if isconverted == 'Not converted':
             try:
                 arr = np.load('Data/' + filename + ' reading ' + str(i) + '.npy')
                 arr = np.delete(arr, np.where(arr == 0))
-                if len(arr) != 0:
+                if len(arr) != 0 and np.mean(arr) != 0:
                     depth = np.mean(arr) - MeasurmentError
                     meanarr = np.append(meanarr, depth)
                     np.save('Data/' + filename + ' reading ' + str(i) + ' Depth', depth)

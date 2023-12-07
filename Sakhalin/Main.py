@@ -12,9 +12,9 @@ from sympy import *
 from PyAstronomy import pyaC
 from scipy.signal import savgol_filter
 from tkinter import *
-from tqdm import tqdm_gui
-from tkinter.ttk import Checkbutton, Combobox
+from tkinter.ttk import Checkbutton, Combobox, Progressbar
 from tkinter.messagebox import showinfo
+import re
 
 DateStart = datetime.datetime.strptime((open('DataTXT/INFO.dat').readlines()[5].strip()),
                                        '%Y.%m.%d %H:%M:%S.%f').date()
@@ -29,34 +29,27 @@ def seriesreducer(arr, times, n=2):
     return arr
 
 
-def meanvalueplot(series):
-    if len(series) % 2 != 0:
-        series = np.delete(series, 0)
-    a = series[::2]
-    b = series[1::2]
-    mean = a / b
-    xmean = 2 * np.arange(0, len(mean))
-    return xmean, mean
-
-
 def divedetector(series):
-    x, seriessplit = meanvalueplot(series)
-    a, b = np.split(seriessplit, 2)
-    a = np.flip(a)
-    for i in a:
-        if 0.5 < i < 1.5:
-            a = np.delete(a, [0])
-        else:
-            break
-    for i in b:
-        if 0.5 < i < 1.5:
-            b = np.delete(b, [0])
-        else:
-            break
-    xbegin = np.arange(0, len(series[0:2 * len(a)]))
-    ybegin = series[0:2 * len(a)]
-    xend = np.arange(len(series) - len(series[0:2 * len(b)]), len(series))
-    yend = np.flip(np.flip(series)[0:2 * len(b)])
+    a = series[0:len(series) // 2]
+    b = series[len(series) // 2:-1]
+    variances_a = []
+    for i in range(len(a) - 1):
+        variances_a.append(np.var(a[i:i + 2]))
+    if np.max(variances_a) > 15 * np.std(variances_a):
+        xbegin = np.arange(np.argmax(variances_a) + 50)
+        ybegin = series[xbegin]
+    else:
+        xbegin = 0
+        ybegin = 0
+    variances_b = []
+    for i in range(len(b) - 1):
+        variances_b.append(np.var(b[i:i + 2]))
+    if np.max(variances_b) > 15 * np.std(variances_b):
+        xend = np.arange(np.argmax(variances_b) - 50 + len(a), len(series))
+        yend = series[xend]
+    else:
+        xend = 0
+        yend = 0
     return xbegin, ybegin, xend, yend
 
 
@@ -247,15 +240,13 @@ def data_from_txt(DateStart=DateStart):
     if not os.path.isdir("Data"):
         os.mkdir("Data")
     Pressure = np.arange(0)
-    ReadingsPerFile = int(open('DataTXT/INFO.dat').readlines()[2].strip()[
-                          15:17]) * 1200  # Сколько точек будет в файле .npy, 20 мин. (Для 8 Гц 9600 точек это 20 минут)
+    ReadingsPerFile = Sensor_Frequency * 1200  # Сколько точек будет в файле .npy (Для 8 Гц 9600 точек -  20 мин.)
     Deltadate = datetime.timedelta(days=1)
-    pbar = tqdm_gui(total=len(pd.date_range(DateStart, DateEnd).strftime('%d.%m').tolist()), desc="Progress: ",
-                colour='green')
 
     while DateStart <= DateEnd:
         counter = 0
-        filename = 'DataTXT/15_Press_meters_' + DateStart.strftime('%Y.%m.%d') + '.dat'
+        filename = 'DataTXT/' + re.findall(r'\d+', open('DataTXT/INFO.dat').readlines()[1].strip())[0] + \
+                   '_Press_meters_' + DateStart.strftime('%Y.%m.%d') + '.dat'
         num_lines = len(open(filename).readlines())
         with open(filename, 'r') as file:
             for line in file:
@@ -266,7 +257,7 @@ def data_from_txt(DateStart=DateStart):
                             Pressure.astype(float))
                     Pressure = np.arange(0)
                     counter += 1
-        pbar.update(1)
+        pb1.step(1)
         DateStart += Deltadate
 
     with open('Data/isconverted.txt', 'w') as file:
@@ -284,11 +275,11 @@ def data_from_txt(DateStart=DateStart):
 def pressure_plotting(Times, DateStart=DateStart):
     Deltadate = datetime.timedelta(days=1)
     dates = pd.date_range(DateStart, DateEnd).strftime('%d.%m').tolist()
-
     y = np.arange(0)
     ticks = np.arange(0)
     c = 0
     np.save('Data/MeasurmentError', np.load('Data/' + DateStart.strftime('%Y.%m.%d') + ' reading 1.npy')[0])
+
     while DateStart <= DateEnd:
         filename = DateStart.strftime('%Y.%m.%d')
         Error = False
@@ -453,8 +444,6 @@ def conversion(Times, DateStart=DateStart):
     MeasurmentError = np.load('Data/MeasurmentError.npy')
     dates, ds, de = newdates(DateStart, DateEnd)
     Deltadate = datetime.timedelta(days=1)
-    pbar = tqdm_gui(total=len(dates), desc="Depth calculating: ", colour='green')
-    pbar2 = tqdm_gui(total=len(dates), desc="Progress: ", colour='green')
     y = np.arange(0)
     ticks = np.arange(0)
     meanarr = np.arange(0)
@@ -478,7 +467,6 @@ def conversion(Times, DateStart=DateStart):
                     Error = True
                 if Error:
                     break
-            pbar.update(1)
             ds += Deltadate
         mean = np.mean(meanarr)
         np.save('Data/Average Depth', mean)
@@ -502,7 +490,6 @@ def conversion(Times, DateStart=DateStart):
                 break
         ticks = np.append(ticks, c + round((len(y) - c) / 2))
         c = len(y)
-        pbar2.update(1)
         ds += Deltadate
 
     if Fl:
@@ -527,7 +514,6 @@ def conversion(Times, DateStart=DateStart):
 def fourier_transforms(Times, TMax, DateStart=DateStart):
     dates, ds, de = newdates(DateStart, DateEnd)
     Deltadate = datetime.timedelta(days=1)
-    pbar = tqdm_gui(total=len(dates), desc="Progress: ", colour='green')
     y = np.arange(0)
     ticks = np.arange(0)
     sizes = np.arange(0)
@@ -553,7 +539,6 @@ def fourier_transforms(Times, TMax, DateStart=DateStart):
                 break
         ticks = np.append(ticks, c + round((len(y) - c) / 2))
         c = len(y)
-        pbar.update(1)
         ds += Deltadate
 
     if istransformed == 'Not transformed':
@@ -600,7 +585,6 @@ def fourier_transforms(Times, TMax, DateStart=DateStart):
 def lowrms_spikes_emptyfiles_spline(minRMSvalue, interpolationrate, spikes, interpolation, DateStart=DateStart):
     dates = pd.date_range(DateStart, DateEnd).strftime('%d.%m').tolist()
     Deltadate = datetime.timedelta(days=1)
-    pbar = tqdm_gui(total=len(dates), desc="Processing: ", colour='green')
     Fl = False
 
     while DateStart <= DateEnd:
@@ -628,7 +612,6 @@ def lowrms_spikes_emptyfiles_spline(minRMSvalue, interpolationrate, spikes, inte
                 Error = True
             if Error:
                 break
-        pbar.update(1)
         DateStart += Deltadate
 
 
@@ -674,7 +657,7 @@ def window_ft(WindowSize, DeltaWindow, part, o):
     w = rfftfreq(window, 1 / Sensor_Frequency)
     z = []
 
-    for i in tqdm_gui(range(0, n), desc="Progress: ", colour='green'):
+    for i in range(0, n):
         arr = y[i * DeltaWindow:window + i * DeltaWindow]
         mask = hann(len(arr))
         s = np.abs(rfft(arr * mask))
@@ -718,7 +701,7 @@ def specrtum_characteristics(DateStart=DateStart):
     n = int((len(y) - window) / (DeltaWindow * Sensor_Frequency))
     w = rfftfreq(window, 1 / Sensor_Frequency)
 
-    for i in tqdm_gui(range(0, n), desc="Progress: ", colour='green'):
+    for i in range(0, n):
         arr = y[i * DeltaWindow:window + i * DeltaWindow]
         mask = hann(len(arr))
         s = np.abs(rfft(arr * mask))
@@ -730,12 +713,11 @@ def specrtum_characteristics(DateStart=DateStart):
 
     np.save('Data/All_width', width)
     np.save('Data/All_w0', w0)
-    np.save('Data/All_E', E)
+    np.save('Data/All_energy', E)
 
     dates, ds, de = newdates(DateStart, DateEnd)
     Deltadate = datetime.timedelta(days=1)
     c = 0
-    pbar = tqdm_gui(total=len(dates), desc="Saving: ", colour='green')
 
     while ds <= de:
         filename = ds.strftime('%Y.%m.%d')
@@ -745,13 +727,13 @@ def specrtum_characteristics(DateStart=DateStart):
                 arr = np.load('Data/' + filename + ' reading ' + str(i) + '.npy')
                 np.save('Data/' + filename + ' reading ' + str(i) + ' width', width[c])
                 np.save('Data/' + filename + ' reading ' + str(i) + ' w0', w0[c])
-                np.save('Data/' + filename + ' reading ' + str(i) + ' E', E[c])
+                np.save('Data/' + filename + ' reading ' + str(i) + ' energy', E[c])
                 c += 1
             except FileNotFoundError:
                 Error = True
             if Error:
                 break
-        pbar.update(1)
+
         ds += Deltadate
 
     fig = plt.figure(num='Spectrum characteristics')
@@ -779,7 +761,7 @@ def specrtum_characteristics(DateStart=DateStart):
 def processing(DateStart=DateStart):
     dates, ds, de = newdates(DateStart, DateEnd)
     Deltadate = datetime.timedelta(days=1)
-    pbar = tqdm_gui(total=len(dates), desc="Progress: ", colour='green')
+
     isprocessed = open('Data/isprocessed.txt').readlines()[0].strip()
     df_pa = np.arange(0)
     df_na = np.arange(0)
@@ -828,7 +810,7 @@ def processing(DateStart=DateStart):
                     Error = True
                 if Error:
                     break
-            pbar.update(1)
+
             ds += Deltadate
         np.save('Data/DF_PA', df_pa)
         np.save('Data/DF_NA', df_na)
@@ -836,7 +818,7 @@ def processing(DateStart=DateStart):
         np.save('Data/MeanHs', np.mean(arrHs))
         np.save('Data/MeanAs', np.mean(arrHs) / 2)
         np.save('Data/All_kh', arrkh)
-        np.save('Data/All_e', arreps)
+        np.save('Data/All_eps', arreps)
         np.save('Data/All_a', arra)
         np.save('Data/All_Ur', arrUr)
 
@@ -937,7 +919,7 @@ def heatmap(o, m, n, DateStart=DateStart):
     Hs = np.arange(0)
     dates, ds, de = newdates(DateStart, DateEnd)
     Deltadate = datetime.timedelta(days=1)
-    pbar = tqdm_gui(total=len(dates), desc="Progress: ", colour='green')
+
 
     while ds <= de:
         filename = ds.strftime('%Y.%m.%d')
@@ -950,7 +932,7 @@ def heatmap(o, m, n, DateStart=DateStart):
                 Error = True
             if Error:
                 break
-        pbar.update(1)
+
         ds += Deltadate
 
     z = np.zeros((m, n), dtype=int)
@@ -1000,15 +982,15 @@ def heatmap(o, m, n, DateStart=DateStart):
         ax.set_xlabel('Tz, [sec]', fontsize=20)
     elif o == 'a':
         ax.set_xlabel('a', fontsize=20)
-    elif o == 'e':
+    elif o == 'eps':
         ax.set_xlabel('ε', fontsize=20)
     elif o == 'Ur':
         ax.set_xlabel('Ur', fontsize=20)
-    elif o == 'WDT':
+    elif o == 'width':
         ax.set_xlabel('Spectrum width', fontsize=20)
     elif o == 'w0':
         ax.set_xlabel('w0, [rad/sec]', fontsize=20)
-    elif o == 'E':
+    elif o == 'energy':
         ax.set_xlabel('Energy', fontsize=20)
     ax.set_ylabel('Hs, [m]', fontsize=20)
     plt.subplots_adjust(left=0, bottom=0.1, right=1, top=0.98, wspace=0.2, hspace=0.2)
@@ -1017,7 +999,7 @@ def heatmap(o, m, n, DateStart=DateStart):
 
 def distribution_for_set(o, DateStart=DateStart):
     dates, ds, de = newdates(DateStart, DateEnd)
-    pbar = tqdm_gui(total=len(dates), desc="Processing: ", colour='green')
+
     Deltadate = datetime.timedelta(days=1)
     all_p = np.sort(np.load('Data/All_' + str(o) + '.npy'))
     splitted_all_p = split_array(all_p, np.array([len(all_p) // 4, len(all_p) // 4, len(all_p) // 4,
@@ -1052,7 +1034,7 @@ def distribution_for_set(o, DateStart=DateStart):
                 Error = True
             if Error:
                 break
-        pbar.update(1)
+
         ds += Deltadate
 
     x1, y1 = distribution_function(hight1)
@@ -1091,7 +1073,7 @@ def distribution_for_set(o, DateStart=DateStart):
 
 def quasiperiodicity_check(o, DateStart=DateStart):
     dates, ds, de = newdates(DateStart, DateEnd)
-    pbar = tqdm_gui(total=len(dates), desc="Processing: ", colour='green')
+
     Deltadate = datetime.timedelta(days=1)
     p = np.arange(0)
 
@@ -1108,7 +1090,7 @@ def quasiperiodicity_check(o, DateStart=DateStart):
                 Error = True
             if Error:
                 break
-        pbar.update(1)
+
         ds += Deltadate
 
     p /= np.max(p)
@@ -1194,7 +1176,10 @@ txtr = Entry(window, width=3, font=("Arial Bold", 10))
 txtr.insert(-1, '10')
 txtr.grid(column=2, row=0)
 lbl1 = Label(window, text="  Step 1: Convert .dat to .npy:  ", font=("Arial Bold", 16)).grid(column=0, row=1)
+pb1 = Progressbar(window, maximum=len(pd.date_range(DateStart, DateEnd).strftime('%d.%m').tolist()))
+pb1.grid(column=2, row=1)
 lbl2 = Label(window, text="  Step 2: Pressure plotting:  ", font=("Arial Bold", 16)).grid(column=0, row=2)
+pb2 = Progressbar(window).grid(column=2, row=2)
 lbl3 = Label(window, text="  Step 3: Manual remove:  ", font=("Arial Bold", 16)).grid(column=0, row=3)
 lbl4 = Label(window, text="  Step 4: Converting and plotting:  ", font=("Arial Bold", 16)).grid(column=0, row=4)
 lbl5 = Label(window, text="  Step 5: Removing low frequencies:  ", font=("Arial Bold", 16)).grid(column=0, row=5)
@@ -1276,14 +1261,14 @@ txtn.grid(column=5, row=14)
 lblparam = Label(window, text=" parameter: ", font=("Arial Bold", 16))
 lblparam.grid(column=6, row=14)
 combo13 = Combobox(window, font=("Arial Bold", 16), width=5)
-combo13['values'] = ('kh', 'Tz', 'a', 'e', 'Ur', 'width', 'w0', 'E')
+combo13['values'] = ('kh', 'Tz', 'a', 'eps', 'Ur', 'width', 'w0', 'energy')
 combo13.current(0)
 combo13.grid(column=7, row=14)
 lbl14 = Label(window, text="  Step 15: Distribution for set:  ", font=("Arial Bold", 16)).grid(column=0, row=15)
 lblsparam = Label(window, text=" parameter: ", font=("Arial Bold", 16))
 lblsparam.grid(column=6, row=15)
 combo14 = Combobox(window, font=("Arial Bold", 16), width=5)
-combo14['values'] = ('kh', 'a', 'e', 'Ur', 'width', 'w0', 'E')
+combo14['values'] = ('kh', 'a', 'eps', 'Ur', 'width', 'w0', 'energy')
 combo14.current(0)
 combo14.grid(column=7, row=15)
 lbl15 = Label(window, text="  Step 16: Quasiperiosicity:  ", font=("Arial Bold", 16)).grid(column=0, row=16)
