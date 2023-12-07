@@ -1,6 +1,6 @@
 /.idea/
 /venv/
-/Data/
-/DataTXT/
-Main.py
-Test.py
+/Data*/
+/DataTXT?_done/
+*.dat
+*.npy
