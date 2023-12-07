@@ -8,6 +8,7 @@ import os
 import pandas as pd
 from scipy.interpolate import CubicSpline
 from scipy.fftpack import fft, ifft, fftfreq
+import re
 
 minRMSvalue = 0.019  # Минимальное значение rms, при котором запись не удаляется
 interpolationrate = 8  # Сколько точек в секунду будет после сплайн-интерполяции
@@ -58,3 +59,13 @@ while DateStart <= DateEnd:
             break
     pbar.update(1)
     DateStart += Deltadate
+
+if interpolation == 'Y':
+    with open('DataTXT/INFO.dat', 'r') as file:
+        content = file.readlines()
+        old = re.findall(r'\d+', content[2])[0]
+        new = str(int(old) * interpolationrate)
+        content[2] = content[2].replace(old, new)
+        new_content = ''.join(content)
+    with open('DataTXT/INFO.dat', 'w') as file:
+        file.write(new_content)
