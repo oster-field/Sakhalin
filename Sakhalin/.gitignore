@@ -4,3 +4,5 @@
 /DataTXT?_done/
 *.dat
 *.npy
+*.xml
+*.iml
