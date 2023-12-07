@@ -10,7 +10,7 @@ from scipy.interpolate import CubicSpline
 from scipy.fftpack import fft, ifft, fftfreq
 import re
 
-minRMSvalue = 0.019  # Минимальное значение rms, при котором запись не удаляется
+minRMSvalue = 0.05  # Минимальное значение rms, при котором запись не удаляется
 interpolationrate = 8  # Сколько точек в секунду будет после сплайн-интерполяции
 print('Delete spikes? (Y/N)')
 spikes = input()

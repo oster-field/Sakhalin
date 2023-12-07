@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import datetime
 from scipy.fftpack import fft, ifft, fftfreq
-from functions import DateStart, DateEnd, seriesreducer, split_array, Sensor_Frequency, newdates, edge_effect
+from functions import DateStart, DateEnd, seriesreducer, split_array, Sensor_Frequency, newdates
 import sys
 from tqdm import tqdm
 
