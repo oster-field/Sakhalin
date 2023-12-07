@@ -9,7 +9,7 @@ import pandas as pd
 from functions import seriesreducer, divedetector, DateStart, DateEnd
 
 Times = 10  # Насколько разредить запись, количество точек уменьшается в (2**Times)
-std = 20
+std = 200
 Deltadate = datetime.timedelta(days=1)
 dates = pd.date_range(DateStart, DateEnd).strftime('%d.%m').tolist()
 
