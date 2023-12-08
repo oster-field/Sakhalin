@@ -8,7 +8,7 @@ from scipy.signal.windows import hann
 
 WindowSize = 10  # Окно преобразования, в минутах
 DeltaWindow = 60  # Сдвиг окна, в секундах
-part = 10  # Процент от спектра, достаточный для отображения
+part = 99  # Процент от спектра, достаточный для отображения
 print('Log/Lin?')
 o = input()
 if o == 'Log':
