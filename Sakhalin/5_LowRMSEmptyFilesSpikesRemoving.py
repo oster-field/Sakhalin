@@ -13,9 +13,11 @@ import re
 minRMSvalue = 0.05  # Минимальное значение rms, при котором запись не удаляется
 interpolationrate = 8  # Сколько точек в секунду будет после сплайн-интерполяции
 print('Delete spikes? (Y/N)')
-spikes = input()
+#spikes = input()
+spikes = 'N'
 print('Spline interpolation? (Y/N)')
-interpolation = input()
+#interpolation = input()
+interpolation = 'N'
 dates = pd.date_range(DateStart, DateEnd).strftime('%d.%m').tolist()
 Deltadate = datetime.timedelta(days=1)
 pbar = tqdm(total=len(dates), desc="Processing: ", colour='green')
@@ -29,6 +31,7 @@ while DateStart <= DateEnd:
             arr = np.load('Data/' + filename + ' reading ' + str(i) + '.npy')
             if len(arr) == 0 or np.mean(arr) == 0:
                 os.remove('Data/' + filename + ' reading ' + str(i) + '.npy')
+                os.remove('Data/' + filename + ' reading ' + str(i) + ' Depth.npy')
                 print('Data/' + filename + ' reading ' + str(i) + '.npy removed as empty')
             else:
                 s = fft(arr)
@@ -39,6 +42,7 @@ while DateStart <= DateEnd:
                 arr_t = ifft(s).real
                 if rmsValue(arr_t) < minRMSvalue:
                     os.remove('Data/' + filename + ' reading ' + str(i) + '.npy')
+                    os.remove('Data/' + filename + ' reading ' + str(i) + ' Depth.npy')
                     print('Data/' + filename + ' reading ' + str(i) + '.npy removed as LowRMS')
                 if spikes == 'Y':
                     for j in range(len(arr) - 1):

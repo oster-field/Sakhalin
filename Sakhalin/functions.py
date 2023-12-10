@@ -28,11 +28,16 @@ from sympy import Symbol, tan
 from scipy.signal import savgol_filter
 import re
 
-DateStart = datetime.datetime.strptime((open('DataTXT/INFO.dat').readlines()[5].strip()),
-                                       '%Y.%m.%d %H:%M:%S.%f').date()
-DateEnd = datetime.datetime.strptime((open('DataTXT/INFO.dat').readlines()[7].strip()),
-                                     '%Y.%m.%d %H:%M:%S.%f').date()
-Sensor_Frequency = int(re.findall(r'\d+', open('DataTXT/INFO.dat').readlines()[2].strip())[0])
+try:
+    DateStart = datetime.datetime.strptime((open('DataTXT/INFO.dat').readlines()[5].strip()),
+                                           '%Y.%m.%d %H:%M:%S.%f').date()
+    DateEnd = datetime.datetime.strptime((open('DataTXT/INFO.dat').readlines()[7].strip()),
+                                         '%Y.%m.%d %H:%M:%S.%f').date()
+    Sensor_Frequency = int(re.findall(r'\d+', open('DataTXT/INFO.dat').readlines()[2].strip())[0])
+except FileNotFoundError:
+    DateStart = None
+    DateEnd = None
+    Sensor_Frequency = None
 
 
 def seriesreducer(arr, times, n=2):

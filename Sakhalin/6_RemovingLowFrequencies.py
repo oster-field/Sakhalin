@@ -52,7 +52,6 @@ if istransformed == 'Not transformed':
     np.save('Data/SpectrumY', s)
     np.save('Data/SpectrumX', x)
     np.save('Data/Samples', len(y))
-    y = y[sizes[0]:-sizes[-1]]
     np.save('Data/FullRec', y)
     for i in range(len(filenames)):
         np.save(filenames[i], splittedy[i])
