@@ -20,22 +20,24 @@ p4 = np.load(f'{o}4.npy')
 fig = plt.figure(num=f'Distribution function splitted by {o}')
 ax = fig.add_subplot(111)
 ax.tick_params(labelsize=20)
+colors = ['#412C84', '#269926', '#BF3030', '#FF6A00']
+linestyles = ['solid', 'dotted', 'dashed', 'dashdot']
 ax.plot(x1, y1, linewidth=2, marker='.', alpha=.65,
-        color='#412C84', label=f'{o} ∈ [{np.round(p0, 2)};{np.round(p1, 2)})')
+        color=colors[0], label=f'{o} ∈ [{np.round(p0, 2)};{np.round(p1, 2)})')
 ax.plot(x2, y2, linewidth=2, marker='.', alpha=.65,
-        color='#269926',
+        color=colors[1],
         label=f'{o} ∈ [{np.round(p1, 2)};{np.round(p2, 2)})')
 ax.plot(x3, y3, linewidth=2, marker='.', alpha=.65,
-        color='#BF3030', label=f'{o} ∈ [{np.round(p2, 2)};{np.round(p3, 2)})')
+        color=colors[2], label=f'{o} ∈ [{np.round(p2, 2)};{np.round(p3, 2)})')
 ax.plot(x4, y4, linewidth=2, marker='.', alpha=.65,
-        color='#FF6A00', label=f'{o} ∈ [{np.round(p3, 2)};{np.round(p4, 2)}]')
+        color=colors[3], label=f'{o} ∈ [{np.round(p3, 2)};{np.round(p4, 2)}]')
 
 xrg = np.arange(0, np.max(np.array([np.max(x1), np.max(x2), np.max(x3), np.max(x4)])), 0.0001)
 c = np.sqrt(np.pi / 8)
 for i in range(1, 5):
-    g = np.load(f'MeanHs{i}') / np.load(f'MeanDepth{i}')
+    g = np.load(f'MeanHs{i}.npy')[0] / np.load(f'MeanDepth{i}.npy')[0]
     yg = np.exp(-1 * (np.pi / (4 + g)) * ((xrg / c) ** (2 / (1 - g * c))))
-    ax.plot(xrg, yg, linewidth=2, color='black', label='Glukhovskiy distribution')
+    ax.plot(xrg, yg, linewidth=2, color=colors[i-1], label='Glukhovskiy distribution', linestyle=linestyles[i-1])
 
 ax.set_xlabel('H/Hs', fontsize=20)
 ax.set_ylabel('F(H)', fontsize=20)

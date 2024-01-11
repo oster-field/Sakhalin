@@ -31,21 +31,13 @@ if __name__ == '__main__':
             all_p = np.append(all_p, np.load(f'Data{i}/All_{str(o)}.npy'))
         except FileNotFoundError:
             break
-    all_p = np.sort(all_p)
-    splitted_all_p = split_array(all_p, np.array([len(all_p) // 4, len(all_p) // 4, len(all_p) // 4,
-                                                  len(all_p) // 4 + len(all_p) % 4]))
-    p0 = splitted_all_p[0][0]
-    p1 = splitted_all_p[1][0]
-    p2 = splitted_all_p[2][0]
-    p3 = splitted_all_p[3][0]
-    p4 = splitted_all_p[3][-1]
-    # Custom parameters:
 
-    np.save(f'{o}0', p0)
-    np.save(f'{o}1', p1)
-    np.save(f'{o}2', p2)
-    np.save(f'{o}3', p3)
-    np.save(f'{o}4', p4)
+    p0 = np.load(f'{o}0.npy')
+    p1 = np.load(f'{o}1.npy')
+    p2 = np.load(f'{o}2.npy')
+    p3 = np.load(f'{o}3.npy')
+    p4 = np.load(f'{o}4.npy')
+
     hight1 = np.arange(0)
     hight2 = np.arange(0)
     hight3 = np.arange(0)
