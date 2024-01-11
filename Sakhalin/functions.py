@@ -24,7 +24,7 @@ import pandas as pd
 from scipy.fftpack import fft, ifft, fftfreq
 from scipy.signal.windows import hann
 from sympy.solvers import nsolve
-from sympy import Symbol, tan
+from sympy import Symbol, tanh
 from scipy.signal import savgol_filter
 import re
 
@@ -200,9 +200,7 @@ def individualwaves(y):
 
 
 def distribution_function(arr):
-    y = np.arange(0)
-    for i in range(0, len(arr)):
-        y = np.append(y, 1 - i / len(arr))
+    y = np.linspace(1, 0, len(arr), endpoint=False)
     x = np.sort(arr)
     return x, y
 
@@ -237,8 +235,8 @@ def rmsValue(arr):
 
 def kh_solver(h, Tz):
     x = Symbol('x')
-    equation = x * tan(x) - (4 * (np.pi ** 2) * h) / (9.81 * (Tz ** 2))
-    kh = nsolve(equation, x, (0, np.pi / 2), solver='bisect')
+    equation = x * tanh(x) - (4 * (np.pi ** 2) * h) / (9.81 * (Tz ** 2))
+    kh = nsolve(equation, x, (0, 2.5), solver='bisect')
     return float(kh)
 
 

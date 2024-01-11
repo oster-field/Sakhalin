@@ -1,0 +1,114 @@
+"""Функция распределения для конкретных значений параметров для всех данных. Используется multiprocessing."""
+import numpy as np
+from functions import split_array
+import sys
+import datetime
+from tqdm import tqdm
+import pandas as pd
+from multiprocessing import Process
+
+
+def distribution_function(arr, num, name):
+    x = np.sort(arr)
+    np.save(f'df(p)_all{name}_x{num}', x)
+
+
+if __name__ == '__main__':
+    print('kh/Tz/a/eps/Ur/width/w0/energy?')
+    o = input()
+    Deltadate = datetime.timedelta(days=1)
+    all_p = np.arange(0)
+    MeanHs1 = np.arange(0)
+    MeanHs2 = np.arange(0)
+    MeanHs3 = np.arange(0)
+    MeanHs4 = np.arange(0)
+    MeanDepth1 = np.arange(0)
+    MeanDepth2 = np.arange(0)
+    MeanDepth3 = np.arange(0)
+    MeanDepth4 = np.arange(0)
+    for i in range(1, sys.maxsize):
+        try:
+            all_p = np.append(all_p, np.load(f'Data{i}/All_{str(o)}.npy'))
+        except FileNotFoundError:
+            break
+    all_p = np.sort(all_p)
+    splitted_all_p = split_array(all_p, np.array([len(all_p) // 4, len(all_p) // 4, len(all_p) // 4,
+                                                  len(all_p) // 4 + len(all_p) % 4]))
+    p0 = splitted_all_p[0][0]
+    p1 = splitted_all_p[1][0]
+    p2 = splitted_all_p[2][0]
+    p3 = splitted_all_p[3][0]
+    p4 = splitted_all_p[3][-1]
+    # Custom parameters:
+
+    np.save(f'{o}0', p0)
+    np.save(f'{o}1', p1)
+    np.save(f'{o}2', p2)
+    np.save(f'{o}3', p3)
+    np.save(f'{o}4', p4)
+    hight1 = np.arange(0)
+    hight2 = np.arange(0)
+    hight3 = np.arange(0)
+    hight4 = np.arange(0)
+    for n in range(1, sys.maxsize):
+        try:
+            ds = datetime.datetime.strptime((open(f'DataTXT{n}_done/INFO.dat').readlines()[5].strip()),
+                                            '%Y.%m.%d %H:%M:%S.%f').date()
+            de = datetime.datetime.strptime((open(f'DataTXT{n}_done/INFO.dat').readlines()[7].strip()),
+                                            '%Y.%m.%d %H:%M:%S.%f').date()
+            dates = pd.date_range(ds, de).strftime('%d.%m').tolist()
+            pbar = tqdm(total=len(dates), desc=f'Folder {n}: ', colour='green')
+            while ds <= de:
+                filename = ds.strftime('%Y.%m.%d')
+                Error = False
+                for i in range(1, sys.maxsize):
+                    try:
+                        hight = np.load(f'Data{n}/{filename} reading {str(i)} L.npy')
+                        Hs = np.load(f'Data{n}/{filename} reading {str(i)} Hs.npy')
+                        p = np.load(f'Data{n}/{filename} reading {str(i)} {str(o)}.npy')
+                        Depth = np.load(f'Data{n}/{filename} reading {str(i)} Depth.npy')
+                        if p0 <= p <= p1:
+                            hight1 = np.append(hight1, hight / Hs)
+                            MeanHs1 = np.append(MeanHs1, Hs)
+                            MeanDepth1 = np.append(MeanDepth1, Depth)
+                        elif p1 < p <= p2:
+                            hight2 = np.append(hight2, hight / Hs)
+                            MeanHs2 = np.append(MeanHs2, Hs)
+                            MeanDepth2 = np.append(MeanDepth2, Depth)
+                        elif p2 < p <= p3:
+                            hight3 = np.append(hight3, hight / Hs)
+                            MeanHs3 = np.append(MeanHs3, Hs)
+                            MeanDepth3 = np.append(MeanDepth3, Depth)
+                        elif p3 < p <= p4:
+                            hight4 = np.append(hight4, hight / Hs)
+                            MeanHs4 = np.append(MeanHs4, Hs)
+                            MeanDepth4 = np.append(MeanDepth4, Depth)
+                    except FileNotFoundError:
+                        Error = True
+                    if Error:
+                        break
+                pbar.update(1)
+                ds += Deltadate
+        except FileNotFoundError:
+            break
+    np.save('MeanHs1', MeanHs1)
+    np.save('MeanHs2', MeanHs2)
+    np.save('MeanHs3', MeanHs3)
+    np.save('MeanHs4', MeanHs4)
+    np.save('MeanDepth1', MeanDepth1)
+    np.save('MeanDepth2', MeanDepth2)
+    np.save('MeanDepth3', MeanDepth3)
+    np.save('MeanDepth4', MeanDepth4)
+
+    process1 = Process(target=distribution_function, args=([hight1], 1, o))
+    process2 = Process(target=distribution_function, args=([hight2], 2, o))
+    process3 = Process(target=distribution_function, args=([hight3], 3, o))
+    process4 = Process(target=distribution_function, args=([hight4], 4, o))
+    process1.start()
+    process2.start()
+    process3.start()
+    process4.start()
+    process1.join()
+    process2.join()
+    process3.join()
+    process4.join()

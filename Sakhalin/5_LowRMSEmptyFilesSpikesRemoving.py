@@ -13,11 +13,9 @@ import re
 minRMSvalue = 0.05  # Минимальное значение rms, при котором запись не удаляется
 interpolationrate = 8  # Сколько точек в секунду будет после сплайн-интерполяции
 print('Delete spikes? (Y/N)')
-#spikes = input()
-spikes = 'N'
+spikes = input()
 print('Spline interpolation? (Y/N)')
-#interpolation = input()
-interpolation = 'N'
+interpolation = input()
 dates = pd.date_range(DateStart, DateEnd).strftime('%d.%m').tolist()
 Deltadate = datetime.timedelta(days=1)
 pbar = tqdm(total=len(dates), desc="Processing: ", colour='green')
