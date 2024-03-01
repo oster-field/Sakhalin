@@ -21,7 +21,7 @@ fig = plt.figure(num=f'Distribution function splitted by {o}')
 ax = fig.add_subplot(111)
 ax.tick_params(labelsize=20)
 colors = ['#412C84', '#269926', '#BF3030', '#FF6A00']
-linestyles = ['solid', 'dotted', 'dashed', 'dashdot']
+linestyles = ['solid', 'dashed', 'dotted', 'dashdot']
 ax.plot(x1, y1, linewidth=2, marker='.', alpha=.65,
         color=colors[0], label=f'{o} ∈ [{np.round(p0, 2)};{np.round(p1, 2)})')
 ax.plot(x2, y2, linewidth=2, marker='.', alpha=.65,
