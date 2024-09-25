@@ -4,8 +4,8 @@ import random
 from scipy.special import erf
 from tqdm import tqdm
 
-num_realizations = 2000
-w0_displacement = 0
+num_realizations = 250
+w0_displacement = 21
 Wc = 1e5
 W = 1e-5
 Q = ((W * Wc) / (W + 2 * np.sqrt(W * Wc) + Wc)) ** (1 / 3)
@@ -71,16 +71,18 @@ p = np.sqrt(1 - (m2 ** 2) / (m0 * m4))
 nu = np.sqrt(m0 * m2 / (m1 ** 2) - 1)
 ralaigh = np.exp(- 2 * (x**2))
 raleigh_modified = 1 - (((np.exp(-2 * x**2)) / (1 + np.sqrt(1 - p**2))) * (np.sqrt(1 - p**2) * (np.sqrt(1 - p**2) * np.exp(2 * x**2) * erf((x * np.sqrt(2)) / p) + np.exp(2 * x**2) - erf((x * np.sqrt(2) * np.sqrt(1 - p**2)) / p) - 1) + (p**2) * np.exp(2 * x**2) * erf((x * np.sqrt(2)) / p)))
-# ax.plot(Fx, Fy, color='red', alpha=.65, linewidth=5.5, label=f'ν={np.round(nu,2)}, ϵ={np.round(p,2)}')
-ax.plot(Fx, Fy, color='red', alpha=.85, linewidth=1.5, marker='.', label=f'ν={np.round(nu,2)}, ϵ={np.round(p,2)}')
-ax.set(ylim=[10e-7, 1])
-ax.set(xlim=[0, 3])
+ax.plot(Fx, Fy, color='red', alpha=.65, linewidth=5.5, label=f'ν={np.round(nu,2)}, ϵ={np.round(p,2)}')
+ax.set(ylim=[0, 1])
+ax.set(xlim=[0, 2])
 ax.plot(x, ralaigh, color='black', alpha=1, linestyle='--', linewidth=2, label='Rayleigh CDF')
 ax.plot(x, raleigh_modified, color='black', alpha=1, linewidth=2, linestyle='-.', label='CDF(ϵ)')
 ax.legend(fontsize=15)
 ax.set_xlabel('local positive maxima normalized to aₛ', fontsize=20)
 ax.set_ylabel('CDF', fontsize=20)
 ax.tick_params(labelsize=20)
-plt.yscale('log')
+np.save('WP_2', p)
+np.save('LM_Medium_width_x', Fx)
+np.save('LM_Medium_width_y', Fy)
+ax.grid()
 plt.show()
 

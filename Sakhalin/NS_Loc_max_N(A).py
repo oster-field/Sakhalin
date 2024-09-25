@@ -1,3 +1,4 @@
+"""Число локальных максимумов в индивидуальной волне в зависимости от амплитуды"""
 import numpy as np
 import matplotlib.pyplot as plt
 import random
@@ -6,7 +7,7 @@ from tqdm import tqdm
 import sys
 import os
 
-num_realizations = 2
+num_realizations = 2000
 Wc = 1e5
 W = 1e-5
 w0_displacement = 0
@@ -81,7 +82,7 @@ sorted_pairs = sorted(pairs, key=lambda pair: pair[1])
 sorted_F, sorted_x = zip(*sorted_pairs)
 fig = plt.figure()
 ax = fig.add_subplot(111)
-ax.plot(sorted_x, sorted_F, color='#007439', alpha=0.1, linewidth=0, marker='o')
+ax.plot(sorted_x, sorted_F, color='#230672', linewidth=0, marker='|')
 ax.set_xlabel('Normalized value of individual wave amplitude', fontsize=20)
 ax.set_ylabel('Number of local maxima in an individual wave', fontsize=20)
 ax.tick_params(labelsize=20)

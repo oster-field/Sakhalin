@@ -10,7 +10,10 @@ from scipy.interpolate import CubicSpline
 from scipy.fftpack import fft, ifft, fftfreq
 import re
 
-minRMSvalue = 0.05  # Минимальное значение rms, при котором запись не удаляется
+if Sensor_Frequency == 8:
+    minRMSvalue = 0
+else:
+    minRMSvalue = 0.025  # Минимальное значение rms, при котором запись не удаляется
 interpolationrate = 8  # Сколько точек в секунду будет после сплайн-интерполяции
 print('Delete spikes? (Y/N)')
 spikes = input()
@@ -32,13 +35,7 @@ while DateStart <= DateEnd:
                 os.remove('Data/' + filename + ' reading ' + str(i) + ' Depth.npy')
                 print('Data/' + filename + ' reading ' + str(i) + '.npy removed as empty')
             else:
-                s = fft(arr)
-                x = fftfreq(len(arr), (1 / Sensor_Frequency) / (2 * np.pi))
-                for freq in range(len(x)):
-                    if abs(x[freq]) < np.pi / (10 * 30):  # Удаление гармоник длительностью > TMax минут
-                        s[freq] = 0 + 0j
-                arr_t = ifft(s).real
-                if rmsValue(arr_t) < minRMSvalue:
+                if rmsValue(arr) < minRMSvalue:
                     os.remove('Data/' + filename + ' reading ' + str(i) + '.npy')
                     os.remove('Data/' + filename + ' reading ' + str(i) + ' Depth.npy')
                     print('Data/' + filename + ' reading ' + str(i) + '.npy removed as LowRMS')

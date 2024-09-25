@@ -32,6 +32,19 @@
       <excludeFolder url="file://$MODULE_DIR$/Sakhalin/DataTXT13_done" />
       <excludeFolder url="file://$MODULE_DIR$/Sakhalin/DataTXT8" />
       <excludeFolder url="file://$MODULE_DIR$/Sakhalin/Data" />
+      <excludeFolder url="file://$MODULE_DIR$/Sakhalin/DataTXT1" />
+      <excludeFolder url="file://$MODULE_DIR$/Sakhalin/DataTXT2" />
+      <excludeFolder url="file://$MODULE_DIR$/Sakhalin/DataTXT3" />
+      <excludeFolder url="file://$MODULE_DIR$/Sakhalin/DataTXT4" />
+      <excludeFolder url="file://$MODULE_DIR$/Sakhalin/DataTXT5" />
+      <excludeFolder url="file://$MODULE_DIR$/Sakhalin/DataTXT6" />
+      <excludeFolder url="file://$MODULE_DIR$/Sakhalin/DataTXT7" />
+      <excludeFolder url="file://$MODULE_DIR$/Sakhalin/DataTXT9" />
+      <excludeFolder url="file://$MODULE_DIR$/Sakhalin/DataTXT10" />
+      <excludeFolder url="file://$MODULE_DIR$/Sakhalin/DataTXT11" />
+      <excludeFolder url="file://$MODULE_DIR$/Sakhalin/DataTXT12" />
+      <excludeFolder url="file://$MODULE_DIR$/Sakhalin/DataTXT13" />
+      <excludePattern pattern="Data*" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.10 (Course2)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

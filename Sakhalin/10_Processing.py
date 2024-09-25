@@ -17,6 +17,10 @@ arrkh = np.arange(0)
 arreps = np.arange(0)
 arra = np.arange(0)
 arrUr = np.arange(0)
+arrgoda = np.arange(0)
+arrnu = np.arange(0)
+arreps_width = np.arange(0)
+arrrho = np.arange(0)
 
 if isprocessed == 'Not processed':
     while ds <= de:
@@ -26,6 +30,10 @@ if isprocessed == 'Not processed':
             try:
                 arr = np.load('Data/' + filename + ' reading ' + str(i) + '.npy')
                 depth = np.load('Data/' + filename + ' reading ' + str(i) + ' Depth.npy')
+                Q = np.load('Data/' + filename + ' reading ' + str(i) + ' goda.npy')
+                nu = np.load('Data/' + filename + ' reading ' + str(i) + ' nu.npy')
+                EPS = np.load('Data/' + filename + ' reading ' + str(i) + ' eps_width.npy')
+                rho = np.load('Data/' + filename + ' reading ' + str(i) + ' rho.npy')
                 As, Hs, Tz, ymax, ymin, wavelenght = individualwaves(arr)
                 kh = kh_solver(depth, Tz)
                 k = kh / depth
@@ -42,6 +50,16 @@ if isprocessed == 'Not processed':
                 np.save('Data/' + filename + ' reading ' + str(i) + ' eps', eps)
                 np.save('Data/' + filename + ' reading ' + str(i) + ' a', a)
                 np.save('Data/' + filename + ' reading ' + str(i) + ' Ur', Ur)
+                np.save('Data/' + filename + ' reading ' + str(i) + ' BFI_nu', eps / nu)
+                np.save('Data/' + filename + ' reading ' + str(i) + ' BFI_eps', eps / EPS)
+                try:
+                    np.save('Data/' + filename + ' reading ' + str(i) + ' BFI_rho', eps / rho)
+                    arrrho = np.append(arrrho, eps / rho)
+                except RuntimeWarning:
+                    np.save('Data/' + filename + ' reading ' + str(i) + ' BFI_rho', np.mean(arrrho))
+                    arrrho = np.append(arrrho, np.mean(arrrho))
+                np.save('Data/' + filename + ' reading ' + str(i) + ' BFI_goda', eps * Q)
+                np.save('Data/' + filename + ' reading ' + str(i) + ' BFI_goda_divide', eps / Q)
                 df_pa = np.append(df_pa, ymax / As)
                 df_na = np.append(df_na, -1 * ymin / As)
                 df_l = np.append(df_l, wavelenght / Hs)
@@ -50,6 +68,9 @@ if isprocessed == 'Not processed':
                 arreps = np.append(arreps, eps)
                 arra = np.append(arra, a)
                 arrUr = np.append(arrUr, Ur)
+                arrgoda = np.append(arrgoda, eps * Q)
+                arrnu = np.append(arrnu, eps / nu)
+                arreps_width = np.append(arreps_width, eps / EPS)
             except FileNotFoundError:
                 Error = True
             if Error:
@@ -65,5 +86,9 @@ if isprocessed == 'Not processed':
     np.save('Data/All_eps', arreps)
     np.save('Data/All_a', arra)
     np.save('Data/All_Ur', arrUr)
+    np.save('Data/All_BFI_goda', arrgoda)
+    np.save('Data/All_BFI_nu', arrnu)
+    np.save('Data/All_BFI_eps', arreps_width)
+    np.save('Data/All_BFI_rho', arrrho)
     with open('Data/isprocessed.txt', 'w') as file:
         file.write('Processed')

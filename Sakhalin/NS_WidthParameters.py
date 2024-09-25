@@ -1,18 +1,23 @@
+"""Как меняются два параметра ширины в зависимости от спектра."""
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
 
-w0_displacement = 100
+w0_displacement = 300
 Wc = 1e5
 W = 1e-5
-K = 0.12
 Q = ((W * Wc) / (W + 2 * np.sqrt(W * Wc) + Wc)) ** (1 / 3)
 eps_arr = np.arange(0)
 nu_arr = np.arange(0)
-for i in tqdm(range(0, 99), colour='green', desc='Calculating '):
-    w = np.arange(0, 110, 0.0001)
-    S = np.exp(-((w-w0_displacement)**2)/(2 * K**2))
+for i in tqdm(range(0, 301), colour='green', desc='Calculating '):
+    w0 = np.sqrt(Q / Wc) + w0_displacement
+    w1 = np.arange(w0 - np.sqrt(Q / Wc), w0, 0.0001)
+    w2 = np.arange(w0, w0 + np.sqrt(Q / W), 0.0001)
+    S1 = -Wc * (w1 - w0)**2 + Q
+    S2 = -W * (w2 - w0)**2 + Q
+    w = np.append(w1, w2)
+    S = np.append(S1, S2)
     m0 = np.trapz(S, dx=0.0001)
     m1 = np.trapz(w * S, dx=0.0001)
     m2 = np.trapz((w ** 2) * S, dx=0.0001)

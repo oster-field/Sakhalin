@@ -9,7 +9,7 @@ from multiprocessing import Process
 
 def distribution_function(arr, num, name):
     x = np.sort(arr)
-    np.save(f'df(p)_all{name}_x{num}', x)
+    np.save(f'df(p)_all_{name}_goda_cond4_x{num}', x)
 
 
 if __name__ == '__main__':
@@ -57,23 +57,17 @@ if __name__ == '__main__':
                         hight = np.load(f'Data{n}/{filename} reading {str(i)} L.npy')
                         Hs = np.load(f'Data{n}/{filename} reading {str(i)} Hs.npy')
                         p = np.load(f'Data{n}/{filename} reading {str(i)} {str(o)}.npy')
+                        goda = np.load(f'Data{n}/{filename} reading {str(i)} goda.npy')
                         Depth = np.load(f'Data{n}/{filename} reading {str(i)} Depth.npy')
-                        if p0 <= p <= p1:
-                            hight1 = np.append(hight1, hight / Hs)
-                            MeanHs1 = np.append(MeanHs1, Hs)
-                            MeanDepth1 = np.append(MeanDepth1, Depth)
-                        elif p1 < p <= p2:
-                            hight2 = np.append(hight2, hight / Hs)
-                            MeanHs2 = np.append(MeanHs2, Hs)
-                            MeanDepth2 = np.append(MeanDepth2, Depth)
-                        elif p2 < p <= p3:
-                            hight3 = np.append(hight3, hight / Hs)
-                            MeanHs3 = np.append(MeanHs3, Hs)
-                            MeanDepth3 = np.append(MeanDepth3, Depth)
-                        elif p3 < p <= p4:
-                            hight4 = np.append(hight4, hight / Hs)
-                            MeanHs4 = np.append(MeanHs4, Hs)
-                            MeanDepth4 = np.append(MeanDepth4, Depth)
+                        if 0.7 < goda:
+                            if p0 <= p <= p1:
+                                hight1 = np.append(hight1, hight / Hs)
+                            elif p1 < p <= p2:
+                                hight2 = np.append(hight2, hight / Hs)
+                            elif p2 < p <= p3:
+                                hight3 = np.append(hight3, hight / Hs)
+                            elif p3 < p <= p4:
+                                hight4 = np.append(hight4, hight / Hs)
                     except FileNotFoundError:
                         Error = True
                     if Error:
@@ -82,14 +76,6 @@ if __name__ == '__main__':
                 ds += Deltadate
         except FileNotFoundError:
             break
-    np.save('MeanHs1', MeanHs1)
-    np.save('MeanHs2', MeanHs2)
-    np.save('MeanHs3', MeanHs3)
-    np.save('MeanHs4', MeanHs4)
-    np.save('MeanDepth1', MeanDepth1)
-    np.save('MeanDepth2', MeanDepth2)
-    np.save('MeanDepth3', MeanDepth3)
-    np.save('MeanDepth4', MeanDepth4)
 
     process1 = Process(target=distribution_function, args=([hight1], 1, o))
     process2 = Process(target=distribution_function, args=([hight2], 2, o))

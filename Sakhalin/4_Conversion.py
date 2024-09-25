@@ -4,7 +4,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import datetime
-from functions import DateStart, DateEnd, seriesreducer, newdates
+from functions import DateStart, DateEnd, seriesreducer, newdates, Sensor_Frequency
 import sys
 from tqdm import tqdm
 
@@ -33,7 +33,7 @@ if isconverted == 'Not converted':
                 arr = np.load('Data/' + filename + ' reading ' + str(i) + '.npy')
                 arr = np.delete(arr, np.where(arr == 0))
                 if len(arr) != 0 and np.mean(arr) != 0:
-                    depth = np.mean(arr) - MeasurmentError
+                    depth = np.mean(arr)
                     meanarr = np.append(meanarr, depth)
                     np.save('Data/' + filename + ' reading ' + str(i) + ' Depth', depth)
                 np.save('Data/' + filename + ' reading ' + str(i) + '.npy', arr)

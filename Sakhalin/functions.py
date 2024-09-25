@@ -215,15 +215,6 @@ def edge_effect(arr):
     return arr/np.hamming(len(arr))
 
 
-def spectrum_width(w, s):
-    dx = 1 / len(w)
-    m0 = np.trapz(s, dx=dx)
-    m1 = np.trapz(w * s, dx=dx)
-    w0 = m1 / m0
-    m2 = np.trapz(((w - w0) ** 2) * s, dx=dx)
-    return np.sqrt(m2 / ((w0 ** 2) * m0))
-
-
 def rmsValue(arr):
     square = 0
     for element in arr:
@@ -236,7 +227,7 @@ def rmsValue(arr):
 def kh_solver(h, Tz):
     x = Symbol('x')
     equation = x * tanh(x) - (4 * (np.pi ** 2) * h) / (9.81 * (Tz ** 2))
-    kh = nsolve(equation, x, (0, 2.5), solver='bisect')
+    kh = nsolve(equation, x, (0, 100), solver='bisect')
     return float(kh)
 
 

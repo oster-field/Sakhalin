@@ -5,18 +5,18 @@ import random
 from PyAstronomy import pyaC
 from tqdm import tqdm
 
-num_realizations = 100
-Wc = 1e5
-W = 1e-5
+num_realizations = 15
+a = 0.01
+b = 0.5
 F = np.arange(0)
 x = np.arange(0)
 local_extr = 0
 global_extr = 0
-for n in tqdm(range(0, 151), colour='green', desc='Creating realizations '):
-    w0_displacement = 150 - n
-    Q = ((W * Wc) / (W + 2 * np.sqrt(W * Wc) + Wc)) ** (1 / 3)
-    w0 = np.sqrt(Q / Wc) + w0_displacement
-    WDT = 19 * (w0 + np.sqrt(Q / W))
+for n in tqdm(range(0, 100), colour='green', desc='Creating realizations '):
+    a += 0.1
+    b += 0.2
+    c = 1 / (b - a)
+    WDT = 19 * b
     N = 2 ** 13
     dt = 2 * np.pi / WDT
     dw = WDT / N
@@ -31,10 +31,8 @@ for n in tqdm(range(0, 151), colour='green', desc='Creating realizations '):
         for i in range(0, N):
             w = w + dw
             v = random.uniform(0, 2*np.pi)
-            if w0 - np.sqrt(Q / Wc) <= w <= w0:
-                S = -Wc * (w - w0) ** 2 + Q
-            elif w0 < w <= w0 + np.sqrt(Q / W):
-                S = -W * (w - w0) ** 2 + Q
+            if a <= w <= b:
+                S = c
             else:
                 S = 0
             Sw = np.append(Sw, w)

@@ -5,18 +5,19 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from functions import pointInRect
 import datetime
+from tqdm import tqdm
 import sys
 import pandas as pd
 
 print('kh/Tz/a/eps/Ur/width/w0/energy?')
 o = input()
 m = 25  # Число строк
-r = 25  # Число столбцов
+r = 60  # Число столбцов
 x = np.arange(0)
 Hs = np.arange(0)
 Deltadate = datetime.timedelta(days=1)
 
-for n in range(1, sys.maxsize):
+for n in tqdm(range(1, 14), desc='Processing: ', colour='green'):
     try:
         ds = datetime.datetime.strptime((open(f'DataTXT{n}_done/INFO.dat').readlines()[5].strip()),
                                         '%Y.%m.%d %H:%M:%S.%f').date()
@@ -42,9 +43,9 @@ np.save(f'{o}0', 0)
 np.save(f'{o}4', np.max(x))
 # Custom parameters:
 
-np.save(f'{o}1', 0.5)
-np.save(f'{o}2', 1.03)
-np.save(f'{o}3', 2.01)
+np.save(f'{o}1', 0.015)
+np.save(f'{o}2', 0.03)
+np.save(f'{o}3', 0.05)
 
 z = np.zeros((m, r), dtype=int)
 h = np.max(Hs) / m
@@ -82,27 +83,12 @@ ax.set_xticks(xlabs, labels=np.round(xlabs, 2), rotation=30)
 ax.set_yticks(ylabs, labels=np.round(ylabs, 2))
 img = ax.imshow(z, extent=[0, np.max(x), 0, np.max(Hs)], cmap='bone')
 plt.tight_layout(h_pad=1)
-ratio = 0.6
+ratio = 0.5
 x_left, x_right = ax.get_xlim()
 y_low, y_high = ax.get_ylim()
 ax.set_aspect(abs((x_right - x_left) / (y_low - y_high)) * ratio)
 ax.tick_params(labelsize=17)
-if o == 'kh':
-    ax.set_xlabel('kh', fontsize=20)
-elif o == 'Tz':
-    ax.set_xlabel('Tz, [sec]', fontsize=20)
-elif o == 'a':
-    ax.set_xlabel('a', fontsize=20)
-elif o == 'eps':
-    ax.set_xlabel('ε', fontsize=20)
-elif o == 'Ur':
-    ax.set_xlabel('Ur', fontsize=20)
-elif o == 'width':
-    ax.set_xlabel('Spectrum width', fontsize=20)
-elif o == 'w0':
-    ax.set_xlabel('w0, [rad/sec]', fontsize=20)
-elif o == 'energy':
-    ax.set_xlabel('Energy', fontsize=20)
+ax.set_xlabel('Spectrum width', fontsize=20)
 ax.set_ylabel('Hs, [m]', fontsize=20)
 plt.subplots_adjust(left=0, bottom=0.1, right=1, top=0.98, wspace=0.2, hspace=0.2)
 plt.show()
