@@ -17,6 +17,7 @@ p3 = np.load(f'{o}3.npy')
 p4 = np.load(f'{o}4.npy')
 
 fig, ax = plt.subplots(1, 3)
+rx = np.arange(0, 3, 0.0001)
 for i in range(3):
     ax[i].tick_params(labelsize=20)
     ax[i].set_xlabel('H/4σ', fontsize=20)
@@ -24,6 +25,7 @@ for i in range(3):
     ax[i].set_ylim(top=1, bottom=1.55e-07)
     ax[i].grid()
     ax[i].set_yscale('log')
+    ax[i].plot(rx, np.exp(- 2 * rx**2), linewidth=2, linestyle='dashed', color='black', label='Rayleigh CDF')
 
 colors = ['#412C84', '#269926', '#BF3030', '#FF6A00']
 ax[0].set_ylabel('F(H)', fontsize=20)

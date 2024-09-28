@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 
 
 fig, ax = plt.subplots(1, 3)
+rx = np.arange(0, 3, 0.0001)
 for i in range(3):
     ax[i].tick_params(labelsize=20)
     ax[i].set_xlabel('H/4σ', fontsize=20)
@@ -10,6 +11,7 @@ for i in range(3):
     ax[i].set_ylim(top=1, bottom=3.447e-07)
     ax[i].grid()
     ax[i].set_yscale('log')
+    ax[i].plot(rx, np.exp(- 2 * rx ** 2), linewidth=2, linestyle='dashed', color='black', label='Rayleigh CDF')
 
 ax[0].set_ylabel('F(H)', fontsize=20)
 

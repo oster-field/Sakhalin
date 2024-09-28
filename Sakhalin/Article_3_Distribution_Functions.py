@@ -17,12 +17,14 @@ p3 = np.load(f'{o}3.npy')
 p4 = np.load(f'{o}4.npy')
 
 fig, ax = plt.subplots(1, 3)
+rx = np.arange(0, 3, 0.0001)
 for i in range(3):
     ax[i].tick_params(labelsize=20)
     ax[i].set_xlabel('H/4σ', fontsize=20)
     ax[i].set_xlim(left=0, right=3)
     ax[i].grid()
     ax[i].set_yscale('log')
+    ax[i].plot(rx, np.exp(- 2 * rx ** 2), linewidth=2, linestyle='dashed', color='black', label='Rayleigh CDF')
 
 colors = ['#412C84', '#269926', '#BF3030', '#FF6A00']
 linestyles = ['solid', 'dashed', 'dotted', 'dashdot']
@@ -32,10 +34,10 @@ ax[1].plot(x4[:-1], y4[:-1], linewidth=2, marker='.', alpha=.65, color=colors[3]
 ax[1].plot(x3, y3, linewidth=2, marker='.', alpha=.65, color=colors[2])
 ax[1].plot(x2, y2, linewidth=2, marker='.', alpha=.65, color=colors[1])
 ax[1].plot(x1, y1, linewidth=2, marker='.', alpha=.65, color=colors[0])
-ax[1].plot([], [], linewidth=2, marker='.', alpha=.65, color=colors[0], label=f'ϵ ∈ [{np.round(p0, 2)};{np.round(p1, 2)})')
-ax[1].plot([], [], linewidth=2, marker='.', alpha=.65, color=colors[1], label=f'ϵ ∈ [{np.round(p1, 2)};{np.round(p2, 2)})')
-ax[1].plot([], [], linewidth=2, marker='.', alpha=.65, color=colors[2], label=f'ϵ ∈ [{np.round(p2, 2)};{np.round(p3, 2)})')
-ax[1].plot([], [], linewidth=2, marker='.', alpha=.65, color=colors[3], label=f'ϵ ∈ [{np.round(p3, 2)};{np.round(p4, 2)}]')
+ax[1].plot([], [], linewidth=2, marker='.', alpha=.65, color=colors[0], label=f'χ ∈ [{np.round(p0, 2)};{np.round(p1, 2)})')
+ax[1].plot([], [], linewidth=2, marker='.', alpha=.65, color=colors[1], label=f'χ ∈ [{np.round(p1, 2)};{np.round(p2, 2)})')
+ax[1].plot([], [], linewidth=2, marker='.', alpha=.65, color=colors[2], label=f'χ ∈ [{np.round(p2, 2)};{np.round(p3, 2)})')
+ax[1].plot([], [], linewidth=2, marker='.', alpha=.65, color=colors[3], label=f'χ ∈ [{np.round(p3, 2)};{np.round(p4, 2)}]')
 ax[1].set_ylim(top=1, bottom=np.min(np.array([np.min(y1), np.min(y2), np.min(y3), np.min(y4)])))
 ax[1].legend(fontsize=16, title="")
 
@@ -77,11 +79,11 @@ y1 = np.linspace(1, 0, len(x1), endpoint=False)
 y2 = np.linspace(1, 0, len(x2), endpoint=False)
 y3 = np.linspace(1, 0, len(x3), endpoint=False)
 y4 = np.linspace(1, 0, len(x4), endpoint=False)
-p0 = np.load(f'{o}0.npy')
-p1 = np.load(f'{o}1.npy')
-p2 = np.load(f'{o}2.npy')
-p3 = np.load(f'{o}3.npy')
-p4 = np.load(f'{o}4.npy')
+p0 = np.load(f'{o}0.npy') * 2
+p1 = np.load(f'{o}1.npy') * 2
+p2 = np.load(f'{o}2.npy') * 2
+p3 = np.load(f'{o}3.npy') * 2
+p4 = np.load(f'{o}4.npy') * 2
 
 x_appendix = np.array([1.759, 1.783, 1.8, 1.85, 1.893, 1.9, 1.91])
 y_appendix = np.array([0.000140602, 0.000114996, 9.40527e-05, 7.31533e-05, 5.06018e-05, 3.68e-05, 1.393e-05])

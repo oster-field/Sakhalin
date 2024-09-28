@@ -38,7 +38,6 @@ for n in tqdm(range(1, 14), desc='Processing: ', colour='green'):
     except FileNotFoundError:
         break
 
-x = 2 * x  # recalculating Qp
 z = np.zeros((m, r), dtype=int)
 h = np.max(a) / m
 w = np.max(x) / r
@@ -56,7 +55,7 @@ for i in range(m):
 text = np.asarray(z)
 borders = np.array([921, 458, 65, 15])
 colors = ['#4065FF', '#00C7FF',  '#006E33', '#A3FF40']
-labels = ['12 часов', 'день', 'неделю', 'месяц']
+labels = ['12 hours', 'day', 'week', 'month']
 z = np.flipud(np.asarray(z))
 fig = plt.figure(num=f'Heatmap for {o}')
 ax = fig.add_subplot(111)
@@ -133,7 +132,10 @@ for i in range(len(ylabs)):
         x0 += w
     y0 += h
 for _ in range(len(borders)):
-    ax.plot([], color=colors[_], linewidth=3, label=f'Раз в {labels[_]}')
+    if _ == 0:
+        ax.plot([], color=colors[_], linewidth=3, label=f'Once every {labels[_]}')
+    else:
+        ax.plot([], color=colors[_], linewidth=3, label=f'Once a {labels[_]}')
 ax.set_xticks(xlabs, labels=np.round(xlabs, 2), rotation=35)
 ax.set_yticks(ylabs, labels=np.round(ylabs, 2))
 img = ax.imshow(z, extent=[0, np.max(x), 0, np.max(a)], cmap='hot')

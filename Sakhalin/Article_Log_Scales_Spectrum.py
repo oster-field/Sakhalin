@@ -84,21 +84,20 @@ solitary = np.where(w < 0.228)[0]
 tail = np.where(w > 1)[0]
 '''ax.plot(w[solitary], s[solitary], linewidth=2, color='#A64B00')
 ax.plot(w[tail], s[tail], linewidth=2, color='#7109AA')'''
-solitary_reference_UP = [0.201656, 0.000246749]
-tail_reference_UP = [1.93714, 8.79718e-07]
-solitary_reference_DOWN = [0.1313, 3.41098e-05]
-tail_reference_DOWN = [1.70498, 3.6684e-07]
-a = solitary_reference_DOWN[0] * solitary_reference_DOWN[1]
-b = tail_reference_DOWN[0]**(11/3) * tail_reference_DOWN[1]
-c = solitary_reference_UP[0]**(4/3) * solitary_reference_UP[1]
-d = tail_reference_UP[0] ** 4 * tail_reference_UP[1]
+solitary_reference_1 = [0.201656, 0.000246749]
+solitary_reference_2 = [0.065, 0.00056]
+tail_reference = [1.93714, 8.79718e-07]
+a = solitary_reference_1[0] * solitary_reference_1[1]
+b = solitary_reference_2[0]**(11/3) * solitary_reference_2[1]
+c = tail_reference[0]**(4/3) * tail_reference[1]
+d = tail_reference[0] ** 4 * tail_reference[1]
 x = w[solitary]
 z = w[tail]
-ax.plot(x, a * x**(-1), c='r', linewidth=2, linestyle='dotted', label=r"$ω^{-1}$")
-ax.plot(x, c * x**(-4/3), c='r', linewidth=2, label=r"$ω^{-4/3}$")
-ax.plot(z, b * z**(-11/3), c='r', linewidth=2, linestyle='dashed', label=r"$ω^{-11/3}$")
-ax.plot(z, d * z**(-4), c='r', linewidth=2, linestyle='dashdot', label=r"$ω^{-4}$")
-ax.legend(fontsize=16)
+ax.plot(x, a * x**(-1), c='#45A600', linewidth=2, label=r"$ω^{-1}$")
+ax.plot(x, b * x**(-11/3), c='r', linewidth=2, linestyle='dashed', label=r"$ω^{-11/3}$")
+ax.plot(z, d * z**(-4), c='#45A600', linewidth=2, linestyle='dashdot', label=r"$ω^{-4}$")
+ax.plot(z, c * z**(-4/3), c='r', linewidth=2, linestyle='dotted', label=r"$ω^{-4/3}$")
+ax.legend(fontsize=21)
 plt.subplots_adjust(left=0.064, bottom=0.083, right=0.97, top=0.974, wspace=0.2, hspace=0.2)
 plt.yscale('log')
 plt.xscale('log')

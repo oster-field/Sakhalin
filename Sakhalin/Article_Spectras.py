@@ -83,19 +83,18 @@ ax[0, 0].plot(w3, s3, linewidth=2, color='#007241')
 ax[0, 0].set(ylim=[0, np.max(s3) + 0.01])
 ax[1, 0].plot(w4, s4, linewidth=2, color='#007241')
 ax[1, 0].set(ylim=[0, np.max(s4) + 0.02])
-'''wp = 0.625
+
+wp = 0.655
 gamma = 1.33
-const = 0.00088'''
-wp = 0.61
-gamma = 5.5
-const = 0.00023
+const = 0.6392464885219191
 x1 = np.arange(0.001, wp, 0.001)
 x2 = np.arange(wp, np.max(w4), 0.001)
-JONSWAP1 = (const * (9.8**2) / (x1 ** 5)) * np.exp(-1.25 * (wp / x1)**4) * gamma**(np.exp(-(x1 - wp)**2 / (2 * (0.07 * wp)**2)))
-JONSWAP2 = (const * (9.8**2) / (x2 ** 5)) * np.exp(-1.25 * (wp / x2)**4) * gamma**(np.exp(-(x2 - wp)**2 / (2 * (0.09 * wp)**2)))
+JONSWAP1 = (const * (wp**5) / (x1 ** 5)) * np.exp(-1.25 * (wp / x1)**4) * gamma**(np.exp(-(x1 - wp)**2 / (2 * (0.07 * wp)**2)))
+JONSWAP2 = (const * (wp**5) / (x2 ** 5)) * np.exp(-1.25 * (wp / x2)**4) * gamma**(np.exp(-(x2 - wp)**2 / (2 * (0.09 * wp)**2)))
 ax[1, 0].plot(x1, JONSWAP1, linewidth=2, color='#A40004', label=f'JONSWAP, γ={gamma}')
 ax[1, 0].plot(x2, JONSWAP2, linewidth=2, color='#A40004')
-ax[1, 0].legend(fontsize=16)
+
+ax[1, 0].legend(fontsize=20)
 plt.subplots_adjust(left=0.064, bottom=0.083, right=0.97, top=0.974, wspace=0.2, hspace=0.2)
 plt.show()
 
