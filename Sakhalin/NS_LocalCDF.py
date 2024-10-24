@@ -51,7 +51,7 @@ for counter in tqdm(range(0, num_realizations), colour='green', desc='Creating r
             dq_1 = np.diff(q)
             dq_2 = np.diff(q, n=2)
             for i in range(1, len(dq_2)):
-                if dq_1[i - 1] > 0 >= dq_1[i] and dq_2[i - 1] < 0 and q[i] > 0:
+                if dq_1[i - 1] > 0 >= dq_1[i] and dq_2[i - 1] < 0 < q[i]:
                     extremas = np.append(extremas, q[i] / 1.63)
             q = np.arange(0)
         q = np.append(q, j)

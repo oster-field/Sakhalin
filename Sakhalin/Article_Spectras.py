@@ -69,8 +69,8 @@ w4, s4 = Spectrum(430, 650, 3)
 fig, ax = plt.subplots(2, 2)
 for i in range(2):
     for j in range(2):
-        ax[i, j].tick_params(labelsize=20)
-        ax[i, j].set_xlabel('ω, [rad/s]', fontsize=20)
+        ax[i, j].tick_params(labelsize=18)
+        ax[i, j].set_xlabel('ω, [rad/s]', fontsize=18)
         ax[i, j].set_ylabel('S(ω), [m²/s]', fontsize=20)
         ax[i, j].set(xlim=[0, 2])
         ax[i, j].grid(axis="y")
@@ -82,19 +82,43 @@ ax[1, 1].set(ylim=[0, np.max(s2) + 0.004])
 ax[0, 0].plot(w3, s3, linewidth=2, color='#007241')
 ax[0, 0].set(ylim=[0, np.max(s3) + 0.01])
 ax[1, 0].plot(w4, s4, linewidth=2, color='#007241')
-ax[1, 0].set(ylim=[0, np.max(s4) + 0.02])
+ax[1, 0].set(ylim=[0, 0.38])
 
 wp = 0.655
-gamma = 1.33
+gamma = 1
 const = 0.6392464885219191
 x1 = np.arange(0.001, wp, 0.001)
 x2 = np.arange(wp, np.max(w4), 0.001)
 JONSWAP1 = (const * (wp**5) / (x1 ** 5)) * np.exp(-1.25 * (wp / x1)**4) * gamma**(np.exp(-(x1 - wp)**2 / (2 * (0.07 * wp)**2)))
 JONSWAP2 = (const * (wp**5) / (x2 ** 5)) * np.exp(-1.25 * (wp / x2)**4) * gamma**(np.exp(-(x2 - wp)**2 / (2 * (0.09 * wp)**2)))
+ax[1, 0].plot(x1, JONSWAP1, linewidth=2, color='#E6399B', label=f'JONSWAP, γ={gamma}')
+ax[1, 0].plot(x2, JONSWAP2, linewidth=2, color='#E6399B')
+
+gamma = 1.25
+JONSWAP1 = (const * (wp**5) / (x1 ** 5)) * np.exp(-1.25 * (wp / x1)**4) * gamma**(np.exp(-(x1 - wp)**2 / (2 * (0.07 * wp)**2)))
+JONSWAP2 = (const * (wp**5) / (x2 ** 5)) * np.exp(-1.25 * (wp / x2)**4) * gamma**(np.exp(-(x2 - wp)**2 / (2 * (0.09 * wp)**2)))
+ax[1, 0].plot(x1, JONSWAP1, linewidth=2, color='black', label=f'JONSWAP, γ={gamma}')
+ax[1, 0].plot(x2, JONSWAP2, linewidth=2, color='black')
+
+gamma = 1.5
+JONSWAP1 = (const * (wp**5) / (x1 ** 5)) * np.exp(-1.25 * (wp / x1)**4) * gamma**(np.exp(-(x1 - wp)**2 / (2 * (0.07 * wp)**2)))
+JONSWAP2 = (const * (wp**5) / (x2 ** 5)) * np.exp(-1.25 * (wp / x2)**4) * gamma**(np.exp(-(x2 - wp)**2 / (2 * (0.09 * wp)**2)))
+ax[1, 0].plot(x1, JONSWAP1, linewidth=2, color='#FF7100', label=f'JONSWAP, γ={gamma}')
+ax[1, 0].plot(x2, JONSWAP2, linewidth=2, color='#FF7100')
+
+gamma = 1.75
+JONSWAP1 = (const * (wp**5) / (x1 ** 5)) * np.exp(-1.25 * (wp / x1)**4) * gamma**(np.exp(-(x1 - wp)**2 / (2 * (0.07 * wp)**2)))
+JONSWAP2 = (const * (wp**5) / (x2 ** 5)) * np.exp(-1.25 * (wp / x2)**4) * gamma**(np.exp(-(x2 - wp)**2 / (2 * (0.09 * wp)**2)))
+ax[1, 0].plot(x1, JONSWAP1, linewidth=2, color='#437DD4', label=f'JONSWAP, γ={gamma}')
+ax[1, 0].plot(x2, JONSWAP2, linewidth=2, color='#437DD4')
+
+gamma = 2
+JONSWAP1 = (const * (wp**5) / (x1 ** 5)) * np.exp(-1.25 * (wp / x1)**4) * gamma**(np.exp(-(x1 - wp)**2 / (2 * (0.07 * wp)**2)))
+JONSWAP2 = (const * (wp**5) / (x2 ** 5)) * np.exp(-1.25 * (wp / x2)**4) * gamma**(np.exp(-(x2 - wp)**2 / (2 * (0.09 * wp)**2)))
 ax[1, 0].plot(x1, JONSWAP1, linewidth=2, color='#A40004', label=f'JONSWAP, γ={gamma}')
 ax[1, 0].plot(x2, JONSWAP2, linewidth=2, color='#A40004')
 
-ax[1, 0].legend(fontsize=20)
-plt.subplots_adjust(left=0.064, bottom=0.083, right=0.97, top=0.974, wspace=0.2, hspace=0.2)
+ax[1, 0].legend(fontsize=16)
+plt.subplots_adjust(left=0.074, bottom=0.087, right=0.957, top=0.99, wspace=0.2, hspace=0.2)
 plt.show()
 
