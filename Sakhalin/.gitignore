@@ -1,9 +1,0 @@
-/.idea/
-/venv/
-/Data*/
-/DataTXT?_done/
-test.py
-*.dat
-*.npy
-*.xml
-*.iml
